@@ -8,9 +8,8 @@ function Dashboard() {
             <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                 <div className="mx-auto max-w-7xl h-full flex flex-col">
                     {/* <!-- Empty State Container --> */}
-                    <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-surface-light/50/50 p-12 text-center min-h-[400px]">
-                        <div className="relative flex items-center justify-center size-24 mb-6 rounded-full bg-primary/5">
-                            <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse"></div>
+                    <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border-light bg-surface-light/50/50 p-12 text-center min-h-[400px]">
+                        <div className="relative flex items-center justify-center size-24 mb-6 rounded-full bg-primary-light">
                             <span className="material-symbols-outlined text-primary text-[40px]">dashboard_customize</span>
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">

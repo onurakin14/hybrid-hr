@@ -4,8 +4,11 @@
   --background: #ffffff;
   --foreground: #171717;
   --primary: #4913ec;
+  --primary-light: #c5b0ed;
+  --primary-light-hover: #dcd5ea;
   --primary-hover: #3b0fb8;
   --background-light: #f3f4f6;
+  --border : #e5e7eb;
 }
 
 /* @theme inline {
@@ -36,10 +39,26 @@ body {
   background-color: var(--primary);
 }
 
+.bg-primary-light {
+  background-color: var(--primary-light);
+}
+.bg-primary-light:hover {
+  background-color: var(--primary-light-hover);
+}
+
+.nav-inactive:hover {
+  background-color: var(--primary-light-hover);
+  color: var(--primary);
+}
+
 .bg-primary:hover {
   background-color: var(--primary-hover);
 }
 
 .bg-background-light {
   background-color: var(--background-light);
+}
+
+.border-border-light {
+  border-color: var(--border);
 }
