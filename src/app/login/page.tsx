@@ -1,6 +1,10 @@
+"use client"
+import { useRouter } from "next/navigation";
 import React from "react";
 
 function Login() {
+
+    const router = useRouter();
 
     return (
         <React.Fragment>
@@ -28,7 +32,8 @@ function Login() {
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span className="material-symbols-outlined text-gray-400 text-[20px]">mail</span>
                                     </div>
-                                    <input className="block w-full border rounded-lg border-gray-200 bg-white pl-10 pr-3 py-3 text-sm placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="email" name="email" placeholder="name@company.com" required type="email" />
+                                    <input className="block w-full border rounded-lg border-gray-200 bg-white pl-10 pr-3 py-3 text-sm placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                                        id="email" name="email" placeholder="name@company.com" type="email" defaultValue={"emilys"} />
                                 </div>
                             </div>
                             {/* <!-- Password Field --> */}
@@ -38,13 +43,14 @@ function Login() {
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span className="material-symbols-outlined text-gray-400 text-[20px]">lock</span>
                                     </div>
-                                    <input className="block w-full border rounded-lg border-gray-200 bg-white pl-10 pr-3 py-3 text-sm placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="password" name="password" placeholder="••••••••" required type="password" />
+                                    <input className="block w-full border rounded-lg border-gray-200 bg-white pl-10 pr-3 py-3 text-sm placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                                        id="password" name="password" placeholder="••••••••" type="password" defaultValue={"emilyspass"} />
                                 </div>
                             </div>
                             {/* <!-- Remember Me & Forgot Password --> */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
-                                    <input className="h-4 w-4 border rounded border-gray-300 text-primary focus:ring-primary" id="remember-me" name="remember-me" type="checkbox" />
+                                    <input className="h-4 w-4 border rounded border-gray-300 text-primary focus:ring-primary" id="remember-me" name="remember-me" type="checkbox" defaultChecked />
                                     <label className="ml-2 block text-sm text-gray-500" htmlFor="remember-me">Remember me</label>
                                 </div>
                                 <div className="text-sm">
@@ -52,7 +58,8 @@ function Login() {
                                 </div>
                             </div>
                             {/* <!-- Submit Button --> */}
-                            <button className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200" type="submit">
+                            <button className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200"
+                                type="submit" onClick={() => router.push("admin/dashboard")}>
                                 Sign In
                             </button>
                         </form>
