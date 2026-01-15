@@ -1,20 +1,23 @@
 "use client"
-import axios from "axios";
+import { loginUser } from "../../lib/features/users/usersSlice";
+import { useAppDispatch } from "../../lib/hooks";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 function Login() {
 
     const router = useRouter();
+    const dispatch = useAppDispatch();
+
     const [username, setUsername] = useState("emilys");
     const [password, setPassword] = useState("emilyspass");
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault(); // Form default davranışını engelle
 
-        await axios.post("/api/login", { username, password }).then(res => {
-            if (!res.data.message) router.push("/admin/dashboard");
-            else alert(res.data.message);
+        dispatch(loginUser({ username, password })).then(res => {
+            if (!res.payload.message) router.push("/admin/dashboard");
+            else alert(res.payload.message);
         }).catch(err => console.error(err));
     }
 
