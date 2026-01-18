@@ -1,9 +1,18 @@
 // src/components/projects-detail/Candidates.tsx
-import React from "react";
+"use client";
 
-type CandidateStatus = "Interviewing" | "Technical Test" | "New Applicant" | "Rejected" | "Offer Sent";
+import React from "react";
+import type { User } from "@/types/jsonplaceholder";
+
+type CandidateStatus =
+  | "Interviewing"
+  | "Technical Test"
+  | "New Applicant"
+  | "Rejected"
+  | "Offer Sent";
 
 type Candidate = {
+  id: number;
   name: string;
   role: string;
   applied: string;
@@ -12,43 +21,9 @@ type Candidate = {
   initials?: string;
 };
 
-const CANDIDATES: Candidate[] = [
-  {
-    name: "Emily Robinson",
-    role: "Senior UX Designer",
-    applied: "Applied 2d ago",
-    status: "Interviewing",
-    avatarUrl: "https://i.pravatar.cc/100?img=5",
-  },
-  {
-    name: "James Miller",
-    role: "Frontend Developer",
-    applied: "Applied 5d ago",
-    status: "Technical Test",
-    avatarUrl: "https://i.pravatar.cc/100?img=12",
-  },
-  {
-    name: "Anita Lee",
-    role: "Product Manager",
-    applied: "Applied 1w ago",
-    status: "New Applicant",
-    initials: "AL",
-  },
-  {
-    name: "David Chen",
-    role: "Backend Engineer",
-    applied: "Applied 1w ago",
-    status: "Rejected",
-    avatarUrl: "https://i.pravatar.cc/100?img=3",
-  },
-  {
-    name: "Sarah Connor",
-    role: "QA Engineer",
-    applied: "Applied 2w ago",
-    status: "Offer Sent",
-    initials: "SC",
-  },
-];
+type CandidatesProps = {
+  users: User[];
+};
 
 function cn(...xs: Array<string | false | null | undefined>) {
   return xs.filter(Boolean).join(" ");
@@ -167,8 +142,48 @@ function SmallAvatar({ url, initials }: { url?: string; initials?: string }) {
   );
 }
 
-export default function Candidates() {
+/* ---------------- Mapping helpers ---------------- */
+function pickStatus(id: number): CandidateStatus {
+  // 5 durum dağıtımı
+  const arr: CandidateStatus[] = [
+    "Interviewing",
+    "Technical Test",
+    "New Applicant",
+    "Rejected",
+    "Offer Sent",
+  ];
+  return arr[id % arr.length];
+}
+
+function pickApplied(id: number) {
+  const arr = ["Applied 2d ago", "Applied 5d ago", "Applied 1w ago", "Applied 2w ago"];
+  return arr[id % arr.length];
+}
+
+function pickRole(u: User) {
+  // jsonplaceholder User type'ında company yoksa, burada username/email ile fallback yapıyoruz.
+  // company eklersen aşağıdaki satırı company.name'e bağlayabilirsin.
+  return u.username ? `${u.username}` : "Candidate";
+}
+
+export default function Candidates({ users }: CandidatesProps) {
   const progress = 65;
+
+  // API users -> UI candidates
+  const candidates: Candidate[] = users.slice(0, 12).map((u) => ({
+    id: u.id,
+    name: u.name,
+    role: pickRole(u), // istersen company.name yapacağız
+    applied: pickApplied(u.id),
+    status: pickStatus(u.id),
+    avatarUrl: `https://i.pravatar.cc/100?u=${u.id}`,
+    initials: u.name
+      .split(" ")
+      .map((x) => x[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase(),
+  }));
 
   return (
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -214,16 +229,14 @@ export default function Candidates() {
 
         {/* Rows */}
         <div className="border-t border-slate-100">
-          {CANDIDATES.map((c) => (
-            <div key={c.name} className="border-b border-slate-100 last:border-b-0">
+          {candidates.slice(0, 5).map((c) => (
+            <div key={c.id} className="border-b border-slate-100 last:border-b-0">
               <div className="grid grid-cols-12 items-center px-6 py-5">
                 {/* Candidate */}
                 <div className="col-span-7 flex min-w-0 items-center gap-4">
                   <Avatar c={c} />
                   <div className="min-w-0">
-                    <div className="truncate text-[13px] font-semibold text-slate-900">
-                      {c.name}
-                    </div>
+                    <div className="truncate text-[13px] font-semibold text-slate-900">{c.name}</div>
                     <div className="truncate text-[12px] text-slate-500">
                       {c.role} <span className="text-slate-300">•</span> {c.applied}
                     </div>
@@ -235,7 +248,7 @@ export default function Candidates() {
                   <StatusPill status={c.status} />
                 </div>
 
-                {/* Actions (empty like mock, align right) */}
+                {/* Actions */}
                 <div className="col-span-2 flex justify-end">
                   <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[12px] font-medium text-slate-600 hover:bg-slate-50">
                     View
@@ -301,15 +314,15 @@ export default function Candidates() {
           </div>
 
           <div className="mt-4 flex items-center">
-            <SmallAvatar url="https://i.pravatar.cc/100?img=1" />
+            <SmallAvatar url={`https://i.pravatar.cc/100?u=1`} />
             <div className="-ml-2">
-              <SmallAvatar url="https://i.pravatar.cc/100?img=2" />
+              <SmallAvatar url={`https://i.pravatar.cc/100?u=2`} />
             </div>
             <div className="-ml-2">
-              <SmallAvatar url="https://i.pravatar.cc/100?img=3" />
+              <SmallAvatar url={`https://i.pravatar.cc/100?u=3`} />
             </div>
             <div className="-ml-2">
-              <SmallAvatar url="https://i.pravatar.cc/100?img=4" />
+              <SmallAvatar url={`https://i.pravatar.cc/100?u=4`} />
             </div>
             <div className="-ml-2">
               <div className="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-[11px] font-semibold text-slate-600 ring-2 ring-white">

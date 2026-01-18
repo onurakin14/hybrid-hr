@@ -36,6 +36,7 @@ export default async function ProjectDetailPage({
   const sp = (await searchParams) ?? {};
   const activeTab: Tab = (sp.tab as Tab) ?? "overview";
 
+  // Overview datası
   const post = await apiGet<Post>(`/posts/${id}`);
 
   const leadUserId = ((post.userId - 1) % 10) + 1;
@@ -44,16 +45,19 @@ export default async function ProjectDetailPage({
   const comments = await apiGet<Comment[]>(`/comments?postId=${id}`);
   const recent = comments.slice(0, 3);
 
+  // Tasks datası
   const todos = await apiGet<Todo[]>(`/todos?userId=${leadUserId}`);
   const pending = todos.filter((t) => !t.completed).slice(0, 2);
-
   const tasks = todos.slice(0, 12);
 
-  // Tasks tab için (senin mevcut kullanımın)
+  // ✅ Ortak users (Tasks/Team/Candidates hepsi buradan beslensin)
   const users = await apiGet<User[]>(`/users`);
 
-  // ✅ Team tab için users listesi (istersen slice ile azalt)
+  // ✅ Team tab için (8 kişi gösterelim)
   const teamUsers = users.slice(0, 8);
+
+  // ✅ Candidates tab için (istersen tüm users, ister slice)
+  const candidateUsers = users; // ya da users.slice(0, 10)
 
   const progress = 50 + (id % 50);
 
@@ -182,17 +186,22 @@ export default async function ProjectDetailPage({
         {activeTab === "tasks" ? (
           <Tasks leadUserId={leadUserId} tasks={tasks} users={users} />
         ) : activeTab === "team" ? (
-          // ✅ Team tab eklendi
           <Team users={teamUsers} />
         ) : activeTab === "candidates" ? (
-          <Candidates />
+          <Candidates users={candidateUsers} />
         ) : activeTab === "files" ? (
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="text-sm font-semibold text-slate-900">Files</div>
             <p className="mt-2 text-sm text-slate-600">Files ekranını birazdan ekleyeceğiz.</p>
           </div>
         ) : (
-          <OverviewTab post={post} lead={lead} recent={recent} pending={pending} progress={progress} />
+          <OverviewTab
+            post={post}
+            lead={lead}
+            recent={recent}
+            pending={pending}
+            progress={progress}
+          />
         )}
       </div>
     </div>
