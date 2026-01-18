@@ -36,7 +36,12 @@ function presenceDotClass(p: Presence) {
 function IconPlus() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M12 5v14M5 12h14"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -69,9 +74,24 @@ function IconKebab() {
 function IconGroupAdd() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M16 11a4 4 0 1 0-8 0" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-      <path d="M3.5 20.5a8.5 8.5 0 0 1 17 0" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-      <path d="M18 8v4M16 10h4" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path
+        d="M16 11a4 4 0 1 0-8 0"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3.5 20.5a8.5 8.5 0 0 1 17 0"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+      <path
+        d="M18 8v4M16 10h4"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -80,9 +100,21 @@ function IconGroupAdd() {
 
 export default function Team({ users }: TeamProps) {
   const composition = [
-    { label: "Product Design", count: users.slice(0, 3).length, dot: "bg-purple-500" },
-    { label: "Engineering", count: users.slice(3, 7).length, dot: "bg-blue-500" },
-    { label: "Marketing", count: Math.max(users.length - 7, 0), dot: "bg-green-500" },
+    {
+      label: "Product Design",
+      count: users.slice(0, 3).length,
+      dot: "bg-purple-500",
+    },
+    {
+      label: "Engineering",
+      count: users.slice(3, 7).length,
+      dot: "bg-blue-500",
+    },
+    {
+      label: "Marketing",
+      count: Math.max(users.length - 7, 0),
+      dot: "bg-green-500",
+    },
   ] as const;
 
   const workload = Math.min(50 + users.length * 5, 95);
@@ -96,7 +128,9 @@ export default function Team({ users }: TeamProps) {
           <div className="flex items-center justify-between p-6 border-b border-slate-200">
             <div>
               <h3 className="text-lg font-bold text-slate-900">Project Team</h3>
-              <p className="text-sm text-slate-500 mt-1">Manage access and roles for this project</p>
+              <p className="text-sm text-slate-500 mt-1">
+                Manage access and roles for this project
+              </p>
             </div>
 
             <button className="flex items-center gap-2 rounded-lg bg-[#4913ec] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3b0fc6]">
@@ -112,9 +146,12 @@ export default function Team({ users }: TeamProps) {
               const presence: Presence = u.id % 3 === 0 ? "away" : "online";
 
               return (
-                <div key={u.id} className="flex items-center justify-between p-6 hover:bg-slate-50">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="relative">
+                <div
+                  key={u.id}
+                  className="flex items-center justify-between p-6 hover:bg-slate-50 gap-4"
+                >
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className="relative flex-shrink-0">
                       <img
                         src={`https://i.pravatar.cc/120?u=${u.id}`}
                         alt={u.name}
@@ -123,33 +160,37 @@ export default function Team({ users }: TeamProps) {
                       <div
                         className={cn(
                           "absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white",
-                          presenceDotClass(presence)
+                          presenceDotClass(presence),
                         )}
                       />
                     </div>
 
-                    <div className="min-w-0">
-                      <h4 className="text-sm font-bold text-slate-900 truncate">{u.name}</h4>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-bold text-slate-900 truncate">
+                        {u.name}
+                      </h4>
                       <p className="text-xs text-slate-500 truncate">
-                        {u.company?.name ?? "Company"} • {u.address?.city ?? "City"}
-
+                        {u.company?.name ?? "Company"} •{" "}
+                        {u.address?.city ?? "City"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="hidden sm:flex flex-col items-end gap-1">
+                  <div className="hidden sm:flex flex-col items-center gap-1 w-32 flex-shrink-0">
                     <span
                       className={cn(
-                        "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
-                        accessBadgeClass(access)
+                        "inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium w-20",
+                        accessBadgeClass(access),
                       )}
                     >
                       {access}
                     </span>
-                    <span className="text-xs text-slate-500">Last active: recently</span>
+                    <span className="text-xs text-slate-500 whitespace-nowrap">
+                      Last active: recently
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <button className="p-2 text-slate-400 hover:text-[#4913ec] rounded-lg hover:bg-slate-100">
                       <IconChat />
                     </button>
@@ -167,11 +208,16 @@ export default function Team({ users }: TeamProps) {
       {/* RIGHT */}
       <div className="lg:col-span-4 flex flex-col gap-6">
         <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-          <h3 className="text-base font-bold text-slate-900 mb-4">Team Composition</h3>
+          <h3 className="text-base font-bold text-slate-900 mb-4">
+            Team Composition
+          </h3>
 
           <div className="space-y-4">
             {composition.map((c) => (
-              <div key={c.label} className="flex items-center justify-between text-sm">
+              <div
+                key={c.label}
+                className="flex items-center justify-between text-sm"
+              >
                 <div className="flex items-center gap-2">
                   <span className={cn("h-2.5 w-2.5 rounded-full", c.dot)} />
                   <span className="text-slate-500">{c.label}</span>
@@ -183,15 +229,24 @@ export default function Team({ users }: TeamProps) {
 
           <div className="mt-6 pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-500">Total Workload</span>
-              <span className="text-sm font-bold text-slate-900">{workload}%</span>
+              <span className="text-sm font-medium text-slate-500">
+                Total Workload
+              </span>
+              <span className="text-sm font-bold text-slate-900">
+                {workload}%
+              </span>
             </div>
 
             <div className="w-full bg-slate-200 rounded-full h-2">
-              <div className="bg-[#4913ec] h-2 rounded-full" style={{ width: `${workload}%` }} />
+              <div
+                className="bg-[#4913ec] h-2 rounded-full"
+                style={{ width: `${workload}%` }}
+              />
             </div>
 
-            <p className="text-xs text-slate-500 mt-2">Team capacity is nearing limit.</p>
+            <p className="text-xs text-slate-500 mt-2">
+              Team capacity is nearing limit.
+            </p>
           </div>
         </div>
 
@@ -202,7 +257,9 @@ export default function Team({ users }: TeamProps) {
             </div>
 
             <div>
-              <h3 className="font-bold text-sm text-slate-900">Need more resources?</h3>
+              <h3 className="font-bold text-sm text-slate-900">
+                Need more resources?
+              </h3>
               <p className="text-xs text-slate-500 mt-1">
                 Request additional team members from HR.
               </p>
