@@ -77,3 +77,6 @@ body {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+.border-border-light {
+  border-color: var(--border);
+}
