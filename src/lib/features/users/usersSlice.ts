@@ -11,6 +11,7 @@ export interface User {
     image: string;
     accessToken: string;
     refreshToken: string;
+    message?: string;
 }
 
 interface UserState {
@@ -25,8 +26,8 @@ const initialState: UserState = {
     error: null,
 };
 
-export const loginUser = createAsyncThunk(
-    "user/loginUser", async ({ username, password }: { username: string; password: string }) => {
+export const loginUser = createAsyncThunk<User, { username: string; password: string }>(
+    "user/loginUser", async ({ username, password }) => {
         const res = await axios.post("/api/login", { username, password });
         return res.data;
     }
