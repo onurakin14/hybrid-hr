@@ -2,42 +2,35 @@
 
 import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
+import { logout } from "../../lib/features/users/usersSlice";
 
 function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-    const pathname = usePathname();
+
     const router = useRouter();
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const pathname = usePathname();
+    const dispatch = useAppDispatch();
+    const currentUser = useAppSelector((state) => state.user.user);
+
+    const [isSidebarOpen, setSidebarOpen] = useState(true);
+    const [isUserProfileOpen, setUserProfileOpen] = useState(false);
     const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
-    
-    const getPageTitle = (path: string): { title: string; subtitle: string } => {
-        const segments = path.split('/').filter(Boolean);
-        const lastSegment = segments[segments.length - 1];
-        
-        const pageMap: Record<string, { title: string; subtitle: string }> = {
-            'dashboard': { title: 'Dashboard', subtitle: 'Overview of your enterprise activity' },
-            'projects': { title: 'Projects', subtitle: 'Manage your projects and tasks' },
-            'tasks': { title: 'Tasks', subtitle: 'Track and manage your tasks' },
-            'users': { title: 'Users', subtitle: 'Manage team members and permissions' },
-            'candidates': { title: 'Candidates', subtitle: 'View and manage job candidates' },
-            'settings': { title: 'Settings', subtitle: 'Configure your preferences' },
-            'help': { title: 'Support', subtitle: 'Get help and documentation' },
-        };
-        
-        return pageMap[lastSegment] || { title: 'Dashboard', subtitle: 'Overview of your enterprise activity' };
+
+    const handleLogout = () => {
+        dispatch(logout());
+        router.push('/login');
     };
-    
+
     const isActive = (href: string): boolean => {
         return pathname.includes(href);
     };
-    
-    const { title, subtitle } = getPageTitle(pathname);
 
     return (
         <React.Fragment>
             <div className="bg-background-light text-slate-900 font-display overflow-hidden">
                 <div className="flex h-screen w-full relative">
                     {/* <!-- Sidebar Navigation --> */}
-                    <aside className={`${sidebarOpen ? 'flex' : 'hidden'} md:flex fixed md:relative flex-col bg-[var(--background)] border-r border-light h-full shrink-0 z-20 transition-all duration-300 w-72`}>
+                    <aside className={`${isSidebarOpen ? 'flex' : 'hidden'} md:flex fixed md:relative flex-col bg-[var(--background)] border-r border-light h-full shrink-0 z-20 transition-all duration-300 w-72`}>
                         {/* <!-- Logo Section --> */}
                         <div className="h-16 flex items-center justify-between px-6 border-b border-transparent">
                             <div className="flex items-center gap-3 min-w-0">
@@ -46,7 +39,7 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                 </div>
                                 <h1 className="text-lg font-bold tracking-tight text-slate-900 truncate">Enterprise App</h1>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setSidebarOpen(false)}
                                 className="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors shrink-0"
                                 title="Close sidebar"
@@ -63,13 +56,13 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                         <span className="material-symbols-outlined fill-1 group-hover:text-primary transition-colors">dashboard</span>
                                         <span className="text-sm font-medium">Dashboard</span>
                                     </button>
-                                    {sidebarOpen && (
+                                    {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'dashboard' ? null : 'dashboard')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
                                             <span className="material-symbols-outlined text-[18px] transition-transform opacity-60" style={{ transform: expandedMenu === 'dashboard' ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
                                         </button>
                                     )}
                                 </div>
-                                {sidebarOpen && expandedMenu === 'dashboard' && (
+                                {isSidebarOpen && expandedMenu === 'dashboard' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
                                         <button onClick={() => router.push('/admin/dashboard/overview')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('overview') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
                                             <span className="material-symbols-outlined text-[16px]">overview</span>
@@ -85,13 +78,13 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">folder_open</span>
                                         <span className="text-sm font-medium">Projects</span>
                                     </button>
-                                    {sidebarOpen && (
+                                    {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'projects' ? null : 'projects')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
                                             <span className="material-symbols-outlined text-[18px] transition-transform opacity-60" style={{ transform: expandedMenu === 'projects' ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
                                         </button>
                                     )}
                                 </div>
-                                {sidebarOpen && expandedMenu === 'projects' && (
+                                {isSidebarOpen && expandedMenu === 'projects' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
                                         <button onClick={() => router.push('/admin/projects')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('projects') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
                                             <span className="material-symbols-outlined text-[16px]">list</span>
@@ -115,13 +108,13 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">check_box</span>
                                         <span className="text-sm font-medium">Tasks</span>
                                     </button>
-                                    {sidebarOpen && (
+                                    {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'tasks' ? null : 'tasks')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
                                             <span className="material-symbols-outlined text-[18px] transition-transform opacity-60" style={{ transform: expandedMenu === 'tasks' ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
                                         </button>
                                     )}
                                 </div>
-                                {sidebarOpen && expandedMenu === 'tasks' && (
+                                {isSidebarOpen && expandedMenu === 'tasks' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
                                         <button onClick={() => router.push('/admin/tasks')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('tasks') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
                                             <span className="material-symbols-outlined text-[16px]">list</span>
@@ -145,13 +138,13 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">group</span>
                                         <span className="text-sm font-medium">Users</span>
                                     </button>
-                                    {sidebarOpen && (
+                                    {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'users' ? null : 'users')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
                                             <span className="material-symbols-outlined text-[18px] transition-transform opacity-60" style={{ transform: expandedMenu === 'users' ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
                                         </button>
                                     )}
                                 </div>
-                                {sidebarOpen && expandedMenu === 'users' && (
+                                {isSidebarOpen && expandedMenu === 'users' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
                                         <button onClick={() => router.push('/admin/users')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('users') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
                                             <span className="material-symbols-outlined text-[16px]">list</span>
@@ -175,13 +168,13 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">person_add</span>
                                         <span className="text-sm font-medium">Candidates</span>
                                     </button>
-                                    {sidebarOpen && (
+                                    {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'candidates' ? null : 'candidates')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
                                             <span className="material-symbols-outlined text-[18px] transition-transform opacity-60" style={{ transform: expandedMenu === 'candidates' ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
                                         </button>
                                     )}
                                 </div>
-                                {sidebarOpen && expandedMenu === 'candidates' && (
+                                {isSidebarOpen && expandedMenu === 'candidates' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
                                         <button onClick={() => router.push('/admin/candidates')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('candidates') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
                                             <span className="material-symbols-outlined text-[16px]">list</span>
@@ -213,12 +206,11 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                         <div className="p-4 mt-auto">
                             <div className="flex items-center gap-3">
                                 <button className="group flex items-center justify-center p-0.5 rounded-full ring-2 ring-transparent hover:ring-primary/20 transition-all focus:outline-none shrink-0">
-                                    <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar of a smiling professional woman" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBaWIEZqYNGM4GL0Wtw1f5vCfW1pvUtWRiomZdhh5_M6k5PS3wZjIelazRSe-hGE5pNe2bRZ2roulRUNWJWYqvSJbKU-3NqmHFfKzPdsjcDUc_dEXwpT_m6RybkebDEtpnKvW9QQBMrtxLsR82LMVh4PtV5dXtOo_NcWGzVZdxw3kvKzkLsNMKa7ASeB3pSc_3aJ8FzBaQtCU4shmkhPl334KM0QK0cUTk0tuoQp_B8kyYp9kzRnglsp4Bk-1YsIN6V00Nro-UbvA')" }}>
-                                    </div>
+                                    <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar" style={{ backgroundImage: `url('${currentUser?.image}')`}}></div>
                                 </button>
-                                {sidebarOpen && (
+                                {isSidebarOpen && (
                                     <div className="flex flex-col min-w-0">
-                                        <span className="text-sm font-semibold text-slate-900 leading-none truncate">Jane Doe</span>
+                                        <span className="text-sm font-semibold text-slate-900 leading-none truncate">{`${currentUser?.firstName} ${currentUser?.lastName}`}</span>
                                         <span className="text-xs text-slate-500 mt-1">Admin</span>
                                     </div>
                                 )}
@@ -231,7 +223,7 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                         <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-[var(--background)] border-b border-light sticky top-0 z-10 shadow-sm shadow-slate-200/50">
                             {/* <!-- Left: Search --> */}
                             <div className="flex items-center gap-4">
-                                <button className="md:hidden p-2 -ml-2 rounded-lg text-slate-500 hover:bg-slate-100" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                                <button className="md:hidden p-2 -ml-2 rounded-lg text-slate-500 hover:bg-slate-100" onClick={() => setSidebarOpen(!isSidebarOpen)}>
                                     <span className="material-symbols-outlined">menu</span>
                                 </button>
                                 {/* <!-- Search Trigger (Visual Only) --> */}
@@ -245,29 +237,28 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                 <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
                                 {/* <!-- Notification Bell --> */}
                                 <div className="flex items-center gap-3 relative group">
-                                <button className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors">
-                                    <span className="material-symbols-outlined">notifications</span>
-                                    <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white"></span>
-                                </button>
-                                <button className="flex items-center justify-center p-0.5 rounded-full ring-2 ring-transparent hover:ring-primary/20 transition-all focus:outline-none shrink-0">
-                                    <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar of a smiling professional woman" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBaWIEZqYNGM4GL0Wtw1f5vCfW1pvUtWRiomZdhh5_M6k5PS3wZjIelazRSe-hGE5pNe2bRZ2roulRUNWJWYqvSJbKU-3NqmHFfKzPdsjcDUc_dEXwpT_m6RybkebDEtpnKvW9QQBMrtxLsR82LMVh4PtV5dXtOo_NcWGzVZdxw3kvKzkLsNMKa7ASeB3pSc_3aJ8FzBaQtCU4shmkhPl334KM0QK0cUTk0tuoQp_B8kyYp9kzRnglsp4Bk-1YsIN6V00Nro-UbvA')" }}>
-                                    </div>
-                                </button>
-                                {/* Dropdown Menu */}
-                                <div className="absolute right-0 top-full hidden group-hover:block mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-50">
-                                    <button className="w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-[18px]">logout</span>
-                                        Logout
+                                    <button className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors">
+                                        <span className="material-symbols-outlined">notifications</span>
+                                        <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white"></span>
                                     </button>
-                                </div>
+                                    <button onClick={() => setUserProfileOpen(!isUserProfileOpen)} className="flex items-center justify-center p-0.5 rounded-full ring-2 ring-transparent hover:ring-primary/20 transition-all focus:outline-none shrink-0">
+                                        <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar" style={{ backgroundImage: `url('${currentUser?.image}')` }}></div>
+                                    </button>
+                                    {/* Dropdown Menu */}
+                                    <div className={`absolute right-0 top-full mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-50 ${isUserProfileOpen ? 'block' : 'hidden'}`}>
+                                        <button onClick={handleLogout} className="w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 text-left flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-[18px]">logout</span>
+                                            Logout
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </header>
                         {children}
                     </div>
-                </div>
-            </div>
-        </React.Fragment>
+                </div >
+            </div >
+        </React.Fragment >
     )
 }
 
