@@ -1,174 +1,114 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+// lib/features/tasks/taskSlice.ts
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 
-/* ---------------- TYPES ---------------- */
+export type Status = "backlog" | "todo" | "inprogress" | "done"
+export type Priority = "low" | "medium" | "high"
 
-export type TaskStatus = 'backlog' | 'todo' | 'inprogress' | 'done';
-export type SortType = 'date' | 'title' | 'priority';
+export interface User {
+  id: number
+  name: string
+  avatar: string
+}
 
 export interface Task {
-  id: number;
-  title: string;
-  completed: boolean;
-  userId: number;
-  status: TaskStatus;
-  priority: 1 | 2 | 3;
-  createdAt: string;
+  id: number
+  todo: string
+  status: Status
+  completed: boolean
+  priority: Priority
+  tags: string[]
+  user: User
+  date: string
 }
 
-interface Filters {
-  status: TaskStatus | 'all';
-  completed: boolean | 'all';
+interface State {
+  tasks: Task[]
+  loading: boolean
+  view: "board" | "list"
+  isCreateOpen: boolean
 }
 
-interface TaskState {
-  tasks: Task[];
-  loading: boolean;
-  viewMode: 'board' | 'list';
-  filters: Filters;
-  sort: SortType;
-}
-
-/* ---------------- INITIAL STATE ---------------- */
-
-const initialState: TaskState = {
+const initialState: State = {
   tasks: [],
   loading: false,
-  viewMode: 'board',
-  filters: {
-    status: 'all',
-    completed: 'all',
-  },
-  sort: 'date',
-};
+  view: "board",
+  isCreateOpen: false,
+}
 
-/* ---------------- ASYNC ---------------- */
+/* ---------------- FETCH ---------------- */
+export const fetchTasks = createAsyncThunk("tasks/fetch", async () => {
+  const res = await fetch("https://dummyjson.com/todos?limit=12")
+  const data = await res.json()
 
-export const fetchTasks = createAsyncThunk<Task[]>(
-  'tasks/fetchTasks',
-  async () => {
-    const res = await fetch('https://dummyjson.com/todos?limit=12');
-    const data = await res.json();
+  return data.todos.map((t: any, i: number): Task => ({
+    id: t.id,
+    todo: t.todo,
+    completed: false,
+    status: ["backlog", "todo", "inprogress", "done"][i % 4] as Status,
+    priority: ["low", "medium", "high"][i % 3] as Priority,
+    tags: ["Design", "Backend", "UI/UX"].slice(0, (i % 2) + 1),
+    user: {
+      id: 1,
+      name: "Esra Yılmaz",
+      avatar: "https://i.pravatar.cc/40?img=1",
+    },
+    date: "2025-10-28",
+  }))
+})
 
-    return data.todos.map((todo: any, index: number): Task => ({
-      id: todo.id,
-      title: todo.todo,
-      completed: todo.completed,
-      userId: todo.userId,
-      status: todo.completed
-        ? 'done'
-        : index % 3 === 0
-        ? 'backlog'
-        : index % 3 === 1
-        ? 'todo'
-        : 'inprogress',
-      priority: (Math.floor(Math.random() * 3) + 1) as 1 | 2 | 3,
-      createdAt: new Date(
-        Date.now() - index * 86400000
-      ).toISOString(),
-    }));
+/* ---------------- CREATE ---------------- */
+export const createTask = createAsyncThunk(
+  "tasks/create",
+  async (payload: {
+    todo: string
+    priority: Priority
+    tags: string[]
+  }) => {
+    return {
+      id: Date.now(),
+      todo: payload.todo,
+      completed: false,
+      status: "todo",
+      priority: payload.priority,
+      tags: payload.tags,
+      user: {
+        id: 1,
+        name: "Esra Yılmaz",
+        avatar: "https://i.pravatar.cc/40?img=1",
+      },
+      date: new Date().toISOString().split("T")[0],
+    } as Task
   }
-);
+)
 
-/* ---------------- SLICE ---------------- */
-
-const taskSlice = createSlice({
-  name: 'tasks',
+const slice = createSlice({
+  name: "tasks",
   initialState,
   reducers: {
-    toggleView: (state) => {
-      state.viewMode = state.viewMode === 'board' ? 'list' : 'board';
-    },
-
-    createTask: (
+    moveTask(
       state,
-      action: PayloadAction<{ title: string; status: TaskStatus }>
-    ) => {
-      state.tasks.unshift({
-        id: Date.now(),
-        title: action.payload.title,
-        completed: action.payload.status === 'done',
-        userId: 0,
-        status: action.payload.status,
-        priority: 2,
-        createdAt: new Date().toISOString(),
-      });
+      action: PayloadAction<{ id: number; status: Status }>
+    ) {
+      const task = state.tasks.find(t => t.id === action.payload.id)
+      if (task) task.status = action.payload.status
     },
-
-    setStatusFilter: (
-      state,
-      action: PayloadAction<TaskStatus | 'all'>
-    ) => {
-      state.filters.status = action.payload;
+    toggleView(state) {
+      state.view = state.view === "board" ? "list" : "board"
     },
-
-    setCompletedFilter: (
-      state,
-      action: PayloadAction<boolean | 'all'>
-    ) => {
-      state.filters.completed = action.payload;
-    },
-
-    setSort: (state, action: PayloadAction<SortType>) => {
-      state.sort = action.payload;
+    toggleCreate(state) {
+      state.isCreateOpen = !state.isCreateOpen
     },
   },
-
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(fetchTasks.pending, (state) => {
-        state.loading = true;
+      .addCase(fetchTasks.fulfilled, (s, a) => {
+        s.tasks = a.payload
       })
-      .addCase(fetchTasks.fulfilled, (state, action) => {
-        state.loading = false;
-        state.tasks = action.payload;
+      .addCase(createTask.fulfilled, (s, a) => {
+        s.tasks.unshift(a.payload)
       })
-      .addCase(fetchTasks.rejected, (state) => {
-        state.loading = false;
-      });
   },
-});
+})
 
-/* ---------------- SELECTOR ---------------- */
-
-export const selectFilteredSortedTasks = (state: {
-  tasks: TaskState;
-}) => {
-  const { tasks, filters, sort } = state.tasks;
-  let result = [...tasks];
-
-  if (filters.status !== 'all') {
-    result = result.filter(t => t.status === filters.status);
-  }
-
-  if (filters.completed !== 'all') {
-    result = result.filter(t => t.completed === filters.completed);
-  }
-
-  switch (sort) {
-    case 'title':
-      result.sort((a, b) => a.title.localeCompare(b.title));
-      break;
-    case 'priority':
-      result.sort((a, b) => b.priority - a.priority);
-      break;
-    case 'date':
-    default:
-      result.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
-      );
-  }
-
-  return result;
-};
-
-export const {
-  toggleView,
-  createTask,
-  setStatusFilter,
-  setCompletedFilter,
-  setSort,
-} = taskSlice.actions;
-
-export default taskSlice.reducer;
+export const { moveTask, toggleView, toggleCreate } = slice.actions
+export default slice.reducer
