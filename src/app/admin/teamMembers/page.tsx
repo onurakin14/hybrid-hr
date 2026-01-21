@@ -1,6 +1,19 @@
-import React from "react";
+"use client"
+import { fetchUsers } from "@/lib/features/users/usersSlice";
+import { useAppDispatch } from "../../../lib/hooks";
+import React, { useEffect } from "react";
 
 function TeamMembers() {
+
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchUsers()).then(res => {
+            console.log(res);            
+        }).catch(console.error);
+    });
+
+
     return (
         <React.Fragment>
             {/* Scrollable Content */}

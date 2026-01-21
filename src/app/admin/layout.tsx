@@ -3,14 +3,14 @@
 import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { logout } from "../../lib/features/users/usersSlice";
+import { logout } from "../../lib/features/users/authSlice";
 
 function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 
     const router = useRouter();
     const pathname = usePathname();
     const dispatch = useAppDispatch();
-    const currentUser = useAppSelector((state) => state.user.user);
+    const currentUser = useAppSelector((state) => state.auth.user);
 
     const [isSidebarOpen, setSidebarOpen] = useState(true);
     const [isUserProfileOpen, setUserProfileOpen] = useState(false);

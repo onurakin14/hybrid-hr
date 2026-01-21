@@ -1,5 +1,5 @@
 "use client"
-import { loginUser, User } from "../../lib/features/users/usersSlice";
+import { loginUser, AuthUser } from "../../lib/features/users/authSlice";
 import { useAppDispatch } from "../../lib/hooks";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -16,7 +16,7 @@ function Login() {
         e.preventDefault(); // Form default davranışını engelle
 
         dispatch(loginUser({ username, password })).then(res => {
-            const data = res.payload as User;
+            const data = res.payload as AuthUser;
             if (data.message) alert(data.message);
             else router.push("/admin/dashboard");
         }).catch(err => console.error(err));
