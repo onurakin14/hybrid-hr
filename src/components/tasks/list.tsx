@@ -17,18 +17,6 @@ export default function ListView({ tasks }: { tasks: Task[] }) {
           </tr>
         </thead>
 
-        <tbody>
-          {tasks.map(task => (
-            <tr key={task.id} className="border-t">
-              <td className="p-3 font-medium">{task.todo}</td>
-              <td>{task.status}</td>
-              <td>{task.priority}</td>
-              <td>{task.tags[0]}</td>
-              <td>{task.user.name}</td>
-              <td>{task.date}</td>
-            </tr>
-          ))}
-        </tbody>
       </table>
     </div>
   )

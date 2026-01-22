@@ -1,59 +1,48 @@
-"use client"
+"use client";
 
-import { Droppable, Draggable } from "@hello-pangea/dnd"
-import TaskCard from "./task-card"
-import { Task, Status } from "@/lib/features/tasks/taskSlice"
+import { Droppable, Draggable } from "@hello-pangea/dnd";
+import TaskCard from "./task-card";
+import { Task, TaskStatus } from "@/lib/features/tasks/taskSlice";
+import { Plus } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { toggleCreate } from "@/lib/features/tasks/taskSlice";
 
-interface Props {
-  status: Status
-  title: string
-  tasks: Task[]
-}
+export default function Column({
+  title,
+  status,
+  tasks,
+}: {
+  title: string;
+  status: TaskStatus;
+  tasks: Task[];
+}) {
+  const dispatch = useDispatch();
 
-export default function Column({ status, title, tasks }: Props) {
   return (
-    <Droppable droppableId={status}>
-      {provided => (
-        <div
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-          className="
-            bg-[#F7F8FA]
-            rounded-2xl
-            p-4
-            min-h-[560px]
-            flex
-            flex-col
-          "
-        >
-          {/* HEADER */}
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-900">
-              {title}
-            </h3>
+    <div className="flex-shrink-0 w-72 bg-gray-50 rounded-2xl p-4 flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-sm">{title}</h3>
+        <span className="text-xs bg-gray-200 px-2 py-0.5 rounded-full">
+          {tasks.length}
+        </span>
+      </div>
 
-            <span className="
-              text-xs
-              font-medium
-              bg-gray-200
-              text-gray-700
-              px-2
-              py-0.5
-              rounded-full
-            ">
-              {tasks.length}
-            </span>
-          </div>
-
-          {/* TASK LIST */}
-          <div className="flex flex-col gap-3 flex-1">
+      {/* Tasks */}
+      <Droppable droppableId={status}>
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="flex-1 space-y-3 overflow-y-auto pr-1 scrollbar-thin"
+          >
             {tasks.map((task, index) => (
               <Draggable
                 key={task.id}
                 draggableId={String(task.id)}
                 index={index}
               >
-                {provided => (
+                {(provided) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
@@ -67,27 +56,17 @@ export default function Column({ status, title, tasks }: Props) {
 
             {provided.placeholder}
           </div>
+        )}
+      </Droppable>
 
-          {/* ADD TASK */}
-          <button
-            className="
-              mt-4
-              w-full
-              border
-              border-dashed
-              border-gray-300
-              rounded-xl
-              py-2
-              text-sm
-              text-gray-500
-              hover:bg-gray-100
-              transition
-            "
-          >
-            + Add Task
-          </button>
-        </div>
-      )}
-    </Droppable>
-  )
+      {/* ADD TASK – HER SÜTUN ALTINDA */}
+      <button
+        onClick={() => dispatch(toggleCreate())}
+        className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-700 border border-dashed border-gray-300 rounded-xl py-2 hover:bg-gray-100 transition"
+      >
+        <Plus className="w-4 h-4" />
+        Add Task
+      </button>
+    </div>
+  );
 }

@@ -1,114 +1,166 @@
-// lib/features/tasks/taskSlice.ts
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-export type Status = "backlog" | "todo" | "inprogress" | "done"
-export type Priority = "low" | "medium" | "high"
-
-export interface User {
-  id: number
-  name: string
-  avatar: string
-}
+export type Priority = 'low' | 'medium' | 'high';
+export type TaskStatus = 'backlog' | 'todo' | 'in-progress' | 'done';
 
 export interface Task {
-  id: number
-  todo: string
-  status: Status
-  completed: boolean
-  priority: Priority
-  tags: string[]
-  user: User
-  date: string
+  id: number;
+  todo: string;
+  completed: boolean;
+  userId: number;
+  tags?: string[];
+  priority?: Priority;
+  status?: TaskStatus;
+  assignee?: string;
+  dueDate?: string;
 }
 
-interface State {
-  tasks: Task[]
-  loading: boolean
-  view: "board" | "list"
-  isCreateOpen: boolean
+interface TasksState {
+  tasks: Task[];
+  loading: boolean;
+  error: string | null;
+  isCreateOpen: boolean;
 }
 
-const initialState: State = {
+const initialState: TasksState = {
   tasks: [],
   loading: false,
-  view: "board",
+  error: null,
   isCreateOpen: false,
+};
+
+export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
+  const response = await fetch('https://dummyjson.com/todos?limit=20');
+  const data = await response.json();
+
+  return data.todos.map((task: any, index: number) => ({
+    ...task,
+    status: getStatusFromIndex(index),
+    priority: getPriorityFromIndex(index),
+    tags: getTagsFromIndex(index),
+  }));
+});
+
+function getStatusFromIndex(index: number): TaskStatus {
+  const statuses: TaskStatus[] = ['backlog', 'todo', 'in-progress', 'done'];
+  return statuses[index % 4];
 }
 
-/* ---------------- FETCH ---------------- */
-export const fetchTasks = createAsyncThunk("tasks/fetch", async () => {
-  const res = await fetch("https://dummyjson.com/todos?limit=12")
-  const data = await res.json()
+function getPriorityFromIndex(index: number): Priority {
+  const priorities: Priority[] = ['low', 'medium', 'high'];
+  return priorities[index % 3];
+}
 
-  return data.todos.map((t: any, i: number): Task => ({
-    id: t.id,
-    todo: t.todo,
-    completed: false,
-    status: ["backlog", "todo", "inprogress", "done"][i % 4] as Status,
-    priority: ["low", "medium", "high"][i % 3] as Priority,
-    tags: ["Design", "Backend", "UI/UX"].slice(0, (i % 2) + 1),
-    user: {
-      id: 1,
-      name: "Esra Yılmaz",
-      avatar: "https://i.pravatar.cc/40?img=1",
-    },
-    date: "2025-10-28",
-  }))
-})
+function getTagsFromIndex(index: number): string[] {
+  const allTags = [
+    ['Research'],
+    ['Bug'],
+    ['Design'],
+    ['Backend'],
+    ['Marketing'],
+    ['UI/UX'],
+    ['DevOps'],
+    ['Frontend'],
+  ];
+  return allTags[index % allTags.length];
+}
 
-/* ---------------- CREATE ---------------- */
 export const createTask = createAsyncThunk(
-  "tasks/create",
-  async (payload: {
-    todo: string
-    priority: Priority
-    tags: string[]
-  }) => {
-    return {
-      id: Date.now(),
-      todo: payload.todo,
-      completed: false,
-      status: "todo",
-      priority: payload.priority,
-      tags: payload.tags,
-      user: {
-        id: 1,
-        name: "Esra Yılmaz",
-        avatar: "https://i.pravatar.cc/40?img=1",
-      },
-      date: new Date().toISOString().split("T")[0],
-    } as Task
-  }
-)
+  'tasks/createTask',
+  async (taskData: { todo: string; tags: string[]; priority: Priority }) => {
+    const response = await fetch('https://dummyjson.com/todos/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        todo: taskData.todo,
+        completed: false,
+        userId: 1,
+      }),
+    });
+    const data = await response.json();
 
-const slice = createSlice({
-  name: "tasks",
+    return {
+      ...data,
+      tags: taskData.tags,
+      priority: taskData.priority,
+      status: 'todo' as TaskStatus,
+    };
+  }
+);
+
+export const updateTask = createAsyncThunk(
+  'tasks/updateTask',
+  async (task: Partial<Task> & { id: number }) => {
+    const response = await fetch(`https://dummyjson.com/todos/${task.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(task),
+    });
+    return await response.json();
+  }
+);
+
+export const deleteTask = createAsyncThunk(
+  'tasks/deleteTask',
+  async (id: number) => {
+    await fetch(`https://dummyjson.com/todos/${id}`, {
+      method: 'DELETE',
+    });
+    return id;
+  }
+);
+
+const tasksSlice = createSlice({
+  name: 'tasks',
   initialState,
   reducers: {
-    moveTask(
-      state,
-      action: PayloadAction<{ id: number; status: Status }>
-    ) {
-      const task = state.tasks.find(t => t.id === action.payload.id)
-      if (task) task.status = action.payload.status
+    toggleCreate: (state) => {
+      state.isCreateOpen = !state.isCreateOpen;
     },
-    toggleView(state) {
-      state.view = state.view === "board" ? "list" : "board"
+    moveTask: (state, action: PayloadAction<{ taskId: number; status: TaskStatus }>) => {
+      const task = state.tasks.find((t) => t.id === action.payload.taskId);
+      if (task) {
+        task.status = action.payload.status;
+      }
     },
-    toggleCreate(state) {
-      state.isCreateOpen = !state.isCreateOpen
+    toggleTaskComplete: (state, action: PayloadAction<number>) => {
+      const task = state.tasks.find((t) => t.id === action.payload);
+      if (task) {
+        task.completed = !task.completed;
+        if (task.completed) {
+          task.status = 'done';
+        }
+      }
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(fetchTasks.fulfilled, (s, a) => {
-        s.tasks = a.payload
+      .addCase(fetchTasks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(createTask.fulfilled, (s, a) => {
-        s.tasks.unshift(a.payload)
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
       })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch tasks';
+      })
+      .addCase(createTask.fulfilled, (state, action) => {
+        state.tasks.push(action.payload);
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const index = state.tasks.findIndex((t) => t.id === action.payload.id);
+        if (index !== -1) {
+          state.tasks[index] = { ...state.tasks[index], ...action.payload };
+        }
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.tasks = state.tasks.filter((t) => t.id !== action.payload);
+      });
   },
-})
+});
 
-export const { moveTask, toggleView, toggleCreate } = slice.actions
-export default slice.reducer
+export const { toggleCreate, moveTask, toggleTaskComplete } = tasksSlice.actions;
+export default tasksSlice.reducer;

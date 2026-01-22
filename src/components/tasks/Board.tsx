@@ -1,45 +1,52 @@
-"use client"
+"use client";
 
-import { DragDropContext } from "@hello-pangea/dnd"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { moveTask } from "@/lib/features/tasks/taskSlice"
-import Column from "./column"
-import { Status } from "@/lib/features/tasks/taskSlice"
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/lib/store";
+import {
+  TaskStatus,
+  moveTask,
+  toggleTaskComplete,
+  toggleCreate,
+} from "@/lib/features/tasks/taskSlice";
+import Column from "./column";
+import { Plus } from "lucide-react";
 
-const columns: { key: Status; title: string }[] = [
-  { key: "backlog", title: "Backlog" },
-  { key: "todo", title: "To Do" },
-  { key: "inprogress", title: "In Progress" },
-  { key: "done", title: "Done" },
-]
+const columns: { id: TaskStatus; title: string }[] = [
+  { id: "backlog", title: "Backlog" },
+  { id: "todo", title: "To Do" },
+  { id: "in-progress", title: "In Progress" },
+  { id: "done", title: "Done" },
+];
 
-export default function Board() {
-  const dispatch = useAppDispatch()
-  const tasks = useAppSelector(state => state.tasks.tasks)
+export default function BoardView() {
+  const dispatch = useDispatch();
+  const tasks = useSelector((state: RootState) => state.tasks.tasks);
+
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const taskId = Number(result.draggableId);
+    const newStatus = result.destination.droppableId as TaskStatus;
+
+    dispatch(moveTask({ taskId, status: newStatus }));
+  };
 
   return (
-    <DragDropContext
-      onDragEnd={result => {
-        if (!result.destination) return
-
-        dispatch(
-          moveTask({
-            id: Number(result.draggableId),
-            status: result.destination.droppableId as Status,
-          })
-        )
-      }}
-    >
-      <div className="grid grid-cols-4 gap-6">
-        {columns.map(col => (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flex gap-6 p-6 overflow-x-auto h-[calc(100vh-220px)]">
+        {columns.map((col) => (
           <Column
-            key={col.key}
-            status={col.key}
+            key={col.id}
             title={col.title}
-            tasks={tasks.filter(t => t.status === col.key)}
+            status={col.id}
+            tasks={tasks.filter((t) => t.status === col.id)}
           />
         ))}
+
+       
+      
       </div>
     </DragDropContext>
-  )
+  );
 }
