@@ -9,7 +9,7 @@ import {
   toggleTaskComplete,
   toggleCreate,
 } from "@/lib/features/tasks/taskSlice";
-import Column from "./column";
+import Column from "./Column";
 import { Plus } from "lucide-react";
 
 const columns: { id: TaskStatus; title: string }[] = [

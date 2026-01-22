@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { fetchTasks } from "@/lib/features/tasks/taskSlice";
 import Header from "@/components/tasks/tasks-header";
-import BoardView from "@/components/tasks/board";
+import BoardView from "@/components/tasks/Board";
 import CreateTaskModal from "@/components/tasks/create-task-modal";
+import TaskListView from "@/components/tasks/list";
 
 export default function TasksPage() {
   const dispatch = useDispatch();
@@ -35,9 +36,7 @@ export default function TasksPage() {
         {viewMode === 'board' ? (
           <BoardView />
         ) : (
-          <div className="p-6 text-center text-gray-500">
-            List view coming soon...
-          </div>
+          <TaskListView />
         )}
       </div>
       <CreateTaskModal />
