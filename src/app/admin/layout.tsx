@@ -69,20 +69,6 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                     </div>
                                 )}
                             </div>
-                            {/* <!-- Team Members --> */}
-                            <div>
-                                <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('teamMembers') ? 'bg-primary-light' : 'nav-inactive'}`}>
-                                    <button onClick={() => router.push('/admin/teamMembers')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('teamMembers') ? 'text-primary' : 'text-slate-500'}`} title="teamMembers">
-                                        <span className="material-symbols-outlined fill-1 group-hover:text-primary transition-colors">group</span>
-                                        <span className="text-sm font-medium">Team Members</span>
-                                    </button>
-                                    {isSidebarOpen && (
-                                        <button onClick={() => setExpandedMenu(expandedMenu === 'teamMembers' ? null : 'teamMembers')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
-                                            <span className="material-symbols-outlined text-[18px] transition-transform opacity-60" style={{ transform: expandedMenu === 'teamMembers' ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
                             {/* <!-- Projects --> */}
                             <div>
                                 <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('projects') ? 'bg-primary-light' : 'nav-inactive'}`}>

@@ -50,35 +50,35 @@ const initialState: UsersState = {
 
 export const fetchUsers = createAsyncThunk(
     "users/fetchUsers", async () => {
-        const res = await axios.get("/api/users");
-        return res.data;
+        const res = await axios.get<{ users: User[] }>("https://dummyjson.com/users");
+        return res.data.users;
     }
 );
 
 export const fetchUserById = createAsyncThunk(
     "users/fetchUserById", async (id: number) => {
-        const res = await axios.get(`/api/users/${id}`);
-        return res.data;
+        const res = await axios.get<{ user: User }>(`https://dummyjson.com/users/${id}`);
+        return res.data.user;
     }
 );
 
 export const createUser = createAsyncThunk(
     "users/createUser", async (userData: User) => {
-        const res = await axios.post("/api/users", userData);
+        const res = await axios.post("https://dummyjson.com/users", userData);
         return res.data;
     }
 );
 
 export const updateUser = createAsyncThunk(
     "users/updateUser", async ({ userData }: { userData: Partial<User> }) => {
-        const res = await axios.put(`/api/users/${userData.id}`, userData);
+        const res = await axios.put(`https://dummyjson.com/users/${userData.id}`, userData);
         return res.data;
     }
 );
 
 export const deleteUser = createAsyncThunk(
     "users/deleteUser", async (id: number) => {
-        const res = await axios.delete(`/api/users/${id}`);
+        const res = await axios.delete(`https://dummyjson.com/users/${id}`);
         return res.data;
     }
 );
