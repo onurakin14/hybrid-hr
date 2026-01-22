@@ -62,3 +62,18 @@ body {
 .border-light {
   border-color: var(--border);
 }
+
+/* Scrollbar polish */
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
