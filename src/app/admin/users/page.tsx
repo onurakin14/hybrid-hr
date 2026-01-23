@@ -1,5 +1,5 @@
 "use client"
-import { fetchUsers, User } from "@/lib/features/users/usersSlice";
+import { fetchUsers, fetchUsersByPage, User } from "@/lib/features/users/usersSlice";
 import { useAppDispatch } from "../../../lib/hooks";
 import React, { useEffect, useState } from "react";
 
@@ -8,15 +8,34 @@ function TeamMembers() {
     const dispatch = useAppDispatch();
 
     const [users, setUsers] = useState<User[]>();
+    const [limit, setLimit] = useState(6);
+    const [skip, setSkip] = useState(0);
+
+    const [pageCount, setPageCount] = useState<number>();
+    const [userCount, setUserCount] = useState<number>();
+    const [currentPage, setCurrentPage] = useState<number>(1);
 
     useEffect(() => {
         dispatch(fetchUsers()).then(res => {
             const data = res.payload as User[];
-            setUsers(data);
-            console.log(res.payload);
-        }).catch(console.error);
-    }, []);
+            setUserCount(data.length);
+            setPageCount(Math.ceil(data.length / limit));
+        }).then(getUsers).catch(console.error);
+    }, [dispatch]);
 
+    const getUsers = () => {
+        dispatch(fetchUsersByPage({ limit, skip })).then(res => {
+            const data = res.payload as User[]; setUsers(data);
+        }).catch(console.error);
+    }
+
+    const handlePreviousPageButton = () => {
+        setSkip(skip - limit); getUsers();
+    }
+
+    const handleNextPageButton = () => {
+        setSkip(skip + limit); getUsers();
+    }
 
     return (
         <React.Fragment>
@@ -84,7 +103,12 @@ function TeamMembers() {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10 capitalize">{item.role}</span>
+                                                    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset capitalize 
+                                                        ${item.role == "admin" && "bg-purple-50 text-purple-700 ring-purple-700/10"}
+                                                        ${item.role == "moderator" && "bg-blue-50 text-blue-700 ring-blue-700/10"}
+                                                        ${item.role == "user" && "bg-gray-100 text-gray-600 ring-gray-500/10"}`}>
+                                                        {item.role}
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
@@ -124,14 +148,14 @@ function TeamMembers() {
                         {/* Pagination Footer */}
                         <div className="flex items-center justify-between border-t border-[#dedbe6] px-6 py-4 bg-gray-50/50">
                             <p className="text-sm text-[#6b6189]">
-                                Showing <span className="font-medium text-[#131118]">1</span> to <span className="font-medium text-[#131118]">6</span> of <span className="font-medium text-[#131118]">45</span> results
+                                Showing <span className="font-medium text-[#131118]">{currentPage}</span> to <span className="font-medium text-[#131118]">{limit}</span> of <span className="font-medium text-[#131118]">{userCount}</span> results
                             </p>
                             <div className="flex items-center gap-2">
-                                <button className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 disabled:opacity-50 transition-colors">
+                                <button onClick={handlePreviousPageButton} className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 disabled:opacity-50 transition-colors">
                                     Previous
                                 </button>
                                 <button className="flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors">
-                                    1
+                                    {currentPage}
                                 </button>
                                 <button className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 transition-colors">
                                     2
@@ -140,7 +164,7 @@ function TeamMembers() {
                                     3
                                 </button>
                                 <span className="text-[#6b6189] px-1">...</span>
-                                <button className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 transition-colors">
+                                <button onClick={handleNextPageButton} className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 transition-colors">
                                     Next
                                 </button>
                             </div>

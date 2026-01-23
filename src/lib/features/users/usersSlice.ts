@@ -50,7 +50,15 @@ const initialState: UsersState = {
 
 export const fetchUsers = createAsyncThunk(
     "users/fetchUsers", async () => {
-        const res = await axios.get<{ users: User[] }>("https://dummyjson.com/users");
+        const res = await axios.get<{ users: User[] }>("https://dummyjson.com/users?limit=0");
+        return res.data.users;
+    }
+);
+
+export const fetchUsersByPage = createAsyncThunk<User[], { limit?: number, skip?: number }>(
+    "users/fetchUsersByPage", async ({ limit = 6, skip = 0 }) => {
+        const apiUrl = `https://dummyjson.com/users?limit=${limit}&skip=${skip}`;
+        const res = await axios.get<{ users: User[] }>(apiUrl);
         return res.data.users;
     }
 );
