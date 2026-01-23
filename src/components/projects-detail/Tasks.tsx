@@ -284,7 +284,7 @@ export default function Tasks({ leadUserId, tasks, users }: Props) {
                     ) : null}
 
                     {/* Fallback initials (if no assignee or image blocked) */}
-                
+
                     <div className="text-sm text-slate-900">
                       {r.assignee?.name ?? "Unassigned"}
                     </div>

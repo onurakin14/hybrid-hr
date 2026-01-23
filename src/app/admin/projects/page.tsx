@@ -147,7 +147,7 @@ function Projects() {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                >
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -234,18 +234,18 @@ function Projects() {
                     className="group hover:bg-gray-50 transition-colors"
                   >
                     <td className="py-4 px-6">
-  <Link
-    href={`/admin/projects/${project.id}`}
-    className="flex flex-col cursor-pointer"
-  >
-    <span className="text-[#131118] font-semibold text-sm group-hover:text-[#4913ec]">
-      {project.name}
-    </span>
-    <span className="text-[#6b6189] text-xs">
-      {project.company}
-    </span>
-  </Link>
-</td>
+                      <Link
+                        href={`/admin/projects/${project.id}`}
+                        className="flex flex-col cursor-pointer"
+                      >
+                        <span className="text-[#131118] font-semibold text-sm group-hover:text-[#4913ec]">
+                          {project.name}
+                        </span>
+                        <span className="text-[#6b6189] text-xs">
+                          {project.company}
+                        </span>
+                      </Link>
+                    </td>
 
                     <td className="py-4 px-6">
                       <span

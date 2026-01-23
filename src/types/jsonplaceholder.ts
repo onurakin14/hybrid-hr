@@ -20,5 +20,18 @@ export type User = {
   };
 };
 
+export type CandidateStatus = "new" | "in_review" | "interview" | "rejected" | "offer_sent";
+
+export type Candidate = {
+  id: number | string;       
+  name: string;              
+  email: string;
+  role: string;               
+  status: CandidateStatus;    
+  lastActivityAt?: string;    
+  avatarUrl?: string;        
+};
+
+
 export type Comment = { postId: number; id: number; name: string; email: string; body: string };
 export type Todo = { userId: number; id: number; title: string; completed: boolean };

@@ -1,4 +1,4 @@
-// src/components/projects-detail/Candidates.tsx
+
 "use client";
 
 import React from "react";
@@ -102,12 +102,12 @@ function StatusPill({ status }: { status: CandidateStatus }) {
     status === "Interviewing"
       ? "bg-fuchsia-50 text-fuchsia-700 ring-fuchsia-200"
       : status === "Technical Test"
-      ? "bg-amber-50 text-amber-800 ring-amber-200"
-      : status === "New Applicant"
-      ? "bg-slate-50 text-slate-700 ring-slate-200"
-      : status === "Rejected"
-      ? "bg-rose-50 text-rose-700 ring-rose-200"
-      : "bg-sky-50 text-sky-700 ring-sky-200";
+        ? "bg-amber-50 text-amber-800 ring-amber-200"
+        : status === "New Applicant"
+          ? "bg-slate-50 text-slate-700 ring-slate-200"
+          : status === "Rejected"
+            ? "bg-rose-50 text-rose-700 ring-rose-200"
+            : "bg-sky-50 text-sky-700 ring-sky-200";
 
   return <span className={cn(base, cls)}>{status}</span>;
 }
@@ -116,7 +116,7 @@ function Avatar({ c }: { c: Candidate }) {
   return (
     <div className="h-10 w-10 shrink-0">
       {c.avatarUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
+
         <img src={c.avatarUrl} alt={c.name} className="h-10 w-10 rounded-full object-cover" />
       ) : (
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
@@ -131,7 +131,7 @@ function SmallAvatar({ url, initials }: { url?: string; initials?: string }) {
   return (
     <div className="h-8 w-8 overflow-hidden rounded-full ring-2 ring-white">
       {url ? (
-        // eslint-disable-next-line @next/next/no-img-element
+
         <img src={url} alt="" className="h-8 w-8 object-cover" />
       ) : (
         <div className="flex h-8 w-8 items-center justify-center bg-indigo-100 text-[11px] font-semibold text-indigo-700">
@@ -161,8 +161,7 @@ function pickApplied(id: number) {
 }
 
 function pickRole(u: User) {
-  // jsonplaceholder User type'ında company yoksa, burada username/email ile fallback yapıyoruz.
-  // company eklersen aşağıdaki satırı company.name'e bağlayabilirsin.
+
   return u.username ? `${u.username}` : "Candidate";
 }
 
@@ -173,7 +172,7 @@ export default function Candidates({ users }: CandidatesProps) {
   const candidates: Candidate[] = users.slice(0, 12).map((u) => ({
     id: u.id,
     name: u.name,
-    role: pickRole(u), // istersen company.name yapacağız
+    role: pickRole(u),
     applied: pickApplied(u.id),
     status: pickStatus(u.id),
     avatarUrl: `https://i.pravatar.cc/100?u=${u.id}`,

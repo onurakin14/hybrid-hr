@@ -8,7 +8,7 @@ import OverviewTab from "@/components/projects-detail/Overview";
 
 export const dynamic = "force-dynamic";
 
-type Tab = "overview" | "tasks" | "team" | "candidates" | "files";
+type Tab = "overview" | "tasks" | "team" | "candidates";
 
 function clampId(n: number) {
   if (Number.isNaN(n) || n < 1) return 1;
@@ -50,19 +50,19 @@ export default async function ProjectDetailPage({
   const pending = todos.filter((t) => !t.completed).slice(0, 2);
   const tasks = todos.slice(0, 12);
 
-  // ✅ Ortak users (Tasks/Team/Candidates hepsi buradan beslensin)
+  // ✅ Ortak users 
   const users = await apiGet<User[]>(`/users`);
 
-  // ✅ Team tab için (8 kişi gösterelim)
+  // ✅ Team tab 
   const teamUsers = users.slice(0, 8);
 
-  // ✅ Candidates tab için (istersen tüm users, ister slice)
-  const candidateUsers = users; // ya da users.slice(0, 10)
+  // ✅ Candidates tab 
+  const candidateUsers = users;
 
   const progress = 50 + (id % 50);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="h-[calc(100vh-64px)] overflow-y-auto bg-slate-50">
       <div className="mx-auto w-full max-w-[1600px] px-4 py-8 lg:px-10 xl:px-20 space-y-6">
         {/* Breadcrumb + Header */}
         <div className="space-y-2">
@@ -107,11 +107,10 @@ export default async function ProjectDetailPage({
           <div className="flex gap-6">
             <Link
               href={`/admin/projects/${id}?tab=overview`}
-              className={`relative py-3 text-sm font-medium ${
-                activeTab === "overview"
+              className={`relative py-3 text-sm font-medium ${activeTab === "overview"
                   ? "text-indigo-600"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               Overview
               {activeTab === "overview" && (
@@ -121,16 +120,15 @@ export default async function ProjectDetailPage({
 
             <Link
               href={`/admin/projects/${id}?tab=tasks`}
-              className={`relative py-3 text-sm font-medium ${
-                activeTab === "tasks"
+              className={`relative py-3 text-sm font-medium ${activeTab === "tasks"
                   ? "text-indigo-600"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               <span className="flex items-center gap-2">
                 Tasks
                 <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
-                  12
+                  {todos.length}
                 </span>
               </span>
               {activeTab === "tasks" && (
@@ -140,11 +138,10 @@ export default async function ProjectDetailPage({
 
             <Link
               href={`/admin/projects/${id}?tab=team`}
-              className={`relative py-3 text-sm font-medium ${
-                activeTab === "team"
+              className={`relative py-3 text-sm font-medium ${activeTab === "team"
                   ? "text-indigo-600"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               Team
               {activeTab === "team" && (
@@ -154,11 +151,10 @@ export default async function ProjectDetailPage({
 
             <Link
               href={`/admin/projects/${id}?tab=candidates`}
-              className={`relative py-3 text-sm font-medium ${
-                activeTab === "candidates"
+              className={`relative py-3 text-sm font-medium ${activeTab === "candidates"
                   ? "text-indigo-600"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               Candidates
               {activeTab === "candidates" && (
@@ -166,19 +162,7 @@ export default async function ProjectDetailPage({
               )}
             </Link>
 
-            <Link
-              href={`/admin/projects/${id}?tab=files`}
-              className={`relative py-3 text-sm font-medium ${
-                activeTab === "files"
-                  ? "text-indigo-600"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              Files
-              {activeTab === "files" && (
-                <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-indigo-600" />
-              )}
-            </Link>
+
           </div>
         </div>
 
@@ -189,11 +173,7 @@ export default async function ProjectDetailPage({
           <Team users={teamUsers} />
         ) : activeTab === "candidates" ? (
           <Candidates users={candidateUsers} />
-        ) : activeTab === "files" ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="text-sm font-semibold text-slate-900">Files</div>
-            <p className="mt-2 text-sm text-slate-600">Files ekranını birazdan ekleyeceğiz.</p>
-          </div>
+
         ) : (
           <OverviewTab
             post={post}
@@ -201,6 +181,8 @@ export default async function ProjectDetailPage({
             recent={recent}
             pending={pending}
             progress={progress}
+            teamUsers={teamUsers}
+            candidateUsers={candidateUsers}
           />
         )}
       </div>
