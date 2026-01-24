@@ -246,7 +246,7 @@ function Users() {
                                     {users?.map((item, index) => {
                                         return (
                                             <tr key={index} className="hover:bg-gray-50 transition-colors group">
-                                                <td onClick={() => router.push(`users/${item.id}`)} className="px-6 py-4">
+                                                <td onClick={() => router.push(`users/${item.id}`)} className="px-6 py-4 cursor-pointer">
                                                     <div className="flex items-center gap-4">
                                                         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white shadow-sm" data-alt="Portrait of Jane Doe" style={{ backgroundImage: `url(${item.image})` }}></div>
                                                         <div className="flex flex-col">
