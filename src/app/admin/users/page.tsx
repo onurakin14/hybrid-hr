@@ -1,10 +1,12 @@
 "use client"
-import { fetchUsers, fetchUsersByPage, User } from "@/lib/features/users/usersSlice";
+import { createUser, fetchUsers, fetchUsersByPage, User } from "@/lib/features/users/usersSlice";
 import { useAppDispatch } from "../../../lib/hooks";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-function TeamMembers() {
+function Users() {
 
+    const router = useRouter();
     const dispatch = useAppDispatch();
 
     const [users, setUsers] = useState<User[]>();
@@ -14,6 +16,9 @@ function TeamMembers() {
     const [pageCount, setPageCount] = useState<number>(1);
     const [userCount, setUserCount] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
+
+    const [newUser, setNewUser] = useState<User>();
+    const [isAddUserModalActive, setAddUserModalActive] = useState(false);
 
     useEffect(() => {
         dispatch(fetchUsers()).then(res => {
@@ -54,6 +59,135 @@ function TeamMembers() {
     const endPage = Math.min(pageCount, currentPage + 2);
     const pages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
+    const handleUserFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+
+        setNewUser((data: any) => ({ ...data, [name]: value }));
+        console.log(newUser);
+    }
+
+    const handleAddUser = () => {
+        dispatch(createUser(newUser!)).then(res => {
+            console.log(res.payload); setAddUserModalActive(false);
+        }).catch(console.error);
+    }
+
+    if (isAddUserModalActive) {
+        return (
+            <React.Fragment>
+                <div className="font-display bg-background-light overflow-hidden">
+                    {/* Main Container simulating the app backdrop */}
+                    <div className="relative flex h-screen w-full items-center justify-center p-4">
+                        {/* Background Pattern/Mock Content to provide context */}
+                        <div
+                            className="absolute inset-0 z-0 opacity-40 pointer-events-none"
+                            data-alt="Abstract dot pattern background"
+                            style={{ backgroundImage: "radial-gradient(#4913ec 0.5px, transparent 0.5px), radial-gradient(#4913ec 0.5px, #f6f6f8 0.5px)", backgroundSize: "20px 20px", backgroundPosition: "0 0, 10px 10px" }}>
+                        </div>
+                        {/* Overlay Backdrop */}
+                        <div className="absolute inset-0 z-10 bg-black/20 backdrop-blur-sm"></div>
+                        {/* Modal Component */}
+                        <div className="relative z-20 flex w-full max-w-[720px] flex-col rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                            {/* Header */}
+                            <div className="flex items-start justify-between border-b border-[#dedbe6] p-6 pb-5">
+                                <div className="flex flex-col gap-1 pr-8">
+                                    <h3 className="text-2xl font-bold tracking-tight text-[#131118]">Add New User</h3>
+                                    <p className="text-sm font-normal leading-normal text-[#6b6189]">
+                                        Fill in the information below to add a new member to the team.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setAddUserModalActive(false)}
+                                    className="group flex h-9 w-9 items-center justify-center rounded-lg text-[#6b6189] transition-colors hover:bg-[#f6f6f8] hover:text-[#131118]">
+                                    <span className="material-symbols-outlined !text-[24px]" data-icon="close">close</span>
+                                </button>
+                            </div>
+                            {/* Scrollable Content Area */}
+                            <div className="flex flex-col gap-6 overflow-y-auto p-6 max-h-[70vh]">
+                                {/* Row 1: Names */}
+                                <div className="flex flex-col gap-6 md:flex-row">
+                                    <label className="flex flex-1 flex-col gap-2">
+                                        <span className="text-sm font-medium text-[#131118]">First Name</span>
+                                        <input name="firstName" onChange={handleUserFormChange} className="h-12 w-full rounded-lg border border-[#dedbe6] bg-white px-4 text-base text-[#131118] placeholder:text-[#9ca3af] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Jane" type="text" />
+                                    </label>
+                                    <label className="flex flex-1 flex-col gap-2">
+                                        <span className="text-sm font-medium text-[#131118]">Last Name</span>
+                                        <input name="lastName" onChange={handleUserFormChange} className="h-12 w-full rounded-lg border border-[#dedbe6] bg-white px-4 text-base text-[#131118] placeholder:text-[#9ca3af] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Doe" type="text" />
+                                    </label>
+                                </div>
+                                {/* Row 2: Email & Role */}
+                                <div className="flex flex-col gap-6 md:flex-row">
+                                    {/* Email uses 2/3 width on desktop */}
+                                    <label className="flex flex-[2] flex-col gap-2">
+                                        <span className="text-sm font-medium text-[#131118]">Email Address</span>
+                                        <div className="relative">
+                                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af] !text-[20px]">mail</span>
+                                            <input name="email" onChange={handleUserFormChange} className="h-12 w-full rounded-lg border border-[#dedbe6] bg-white pl-10 pr-4 text-base text-[#131118] placeholder:text-[#9ca3af] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="jane.doe@company.com" type="email" />
+                                        </div>
+                                    </label>
+                                    {/* Role uses 1/3 width */}
+                                    <label className="flex flex-1 flex-col gap-2">
+                                        <span className="text-sm font-medium text-[#131118]">Role</span>
+                                        <div className="relative">
+                                            <select name="role" onChange={handleUserFormChange} className="h-12 w-full appearance-none rounded-lg border border-[#dedbe6] bg-white px-4 pr-10 text-base text-[#131118] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                                <option disabled value="">Select a role</option>
+                                                <option value="admin">Administrator</option>
+                                                <option value="manager">Manager</option>
+                                                <option value="editor">Editor</option>
+                                                <option value="viewer">Viewer</option>
+                                            </select>
+                                            <span className="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6189]">expand_more</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                {/* Row 3: Passwords */}
+                                <div className="flex flex-col gap-6 md:flex-row">
+                                    <label className="flex flex-1 flex-col gap-2">
+                                        <span className="text-sm font-medium text-[#131118]">Password</span>
+                                        <div className="relative">
+                                            <input name="password" onChange={handleUserFormChange} className="h-12 w-full rounded-lg border border-[#dedbe6] bg-white px-4 pr-10 text-base text-[#131118] placeholder:text-[#9ca3af] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="••••••••" type="password" />
+                                            <button className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#4913ec] transition-colors">
+                                                <span className="material-symbols-outlined !text-[20px]">visibility</span>
+                                            </button>
+                                        </div>
+                                    </label>
+                                    <label className="flex flex-1 flex-col gap-2">
+                                        <span className="text-sm font-medium text-[#131118]">Confirm Password</span>
+                                        <div className="relative">
+                                            <input name="password" onChange={handleUserFormChange} className="h-12 w-full rounded-lg border border-[#dedbe6] bg-white px-4 pr-10 text-base text-[#131118] placeholder:text-[#9ca3af] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="••••••••" type="password" />
+                                            <button className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#4913ec] transition-colors">
+                                                <span className="material-symbols-outlined !text-[20px]">visibility_off</span>
+                                            </button>
+                                        </div>
+                                    </label>
+                                </div>
+                                {/* Helper text for password */}
+                                <div className="flex items-center gap-2 text-xs text-[#6b6189]">
+                                    <span className="material-symbols-outlined !text-[16px]">info</span>
+                                    <p>Password must be at least 8 characters long and contain one symbol.</p>
+                                </div>
+                            </div>
+                            {/* Footer */}
+                            <div className="flex items-center justify-end gap-3 rounded-b-2xl bg-[#f6f6f8] p-6">
+                                <button
+                                    onClick={() => setAddUserModalActive(false)}
+                                    className="flex h-10 min-w-[84px] cursor-pointer items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-4 text-sm font-semibold text-[#131118] shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleAddUser()}
+                                    className="flex h-10 min-w-[84px] cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all hover:bg-[#3c0fc4] focus:outline-none focus:ring-2 focus:ring-[#4913ec] focus:ring-offset-2">
+                                    <span className="material-symbols-outlined !text-[18px]">person_add</span>
+                                    Create User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </React.Fragment>
+        )
+    }
+
     return (
         <React.Fragment>
             {/* Scrollable Content */}
@@ -70,7 +204,9 @@ function TeamMembers() {
                                 <span className="material-symbols-outlined text-lg">filter_list</span>
                                 <span>Filter</span>
                             </button>
-                            <button className="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white gap-2 pl-3 text-sm font-bold shadow-md hover:bg-primary/90 transition-all">
+                            <button
+                                onClick={() => setAddUserModalActive(true)}
+                                className="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white gap-2 pl-3 text-sm font-bold shadow-md hover:bg-primary/90 transition-all">
                                 <span className="material-symbols-outlined text-lg">add</span>
                                 <span>Add Member</span>
                             </button>
@@ -110,7 +246,7 @@ function TeamMembers() {
                                     {users?.map((item, index) => {
                                         return (
                                             <tr key={index} className="hover:bg-gray-50 transition-colors group">
-                                                <td className="px-6 py-4">
+                                                <td onClick={() => router.push(`users/${item.id}`)} className="px-6 py-4">
                                                     <div className="flex items-center gap-4">
                                                         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white shadow-sm" data-alt="Portrait of Jane Doe" style={{ backgroundImage: `url(${item.image})` }}></div>
                                                         <div className="flex flex-col">
@@ -176,11 +312,10 @@ function TeamMembers() {
                                     <button
                                         key={page}
                                         onClick={() => setCurrentPage(page)}
-                                        className={`flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                                            page === currentPage
-                                                ? 'bg-primary text-white hover:bg-primary/90'
-                                                : 'border border-[#dedbe6] bg-white text-[#131118] hover:bg-gray-50'
-                                        }`}
+                                        className={`flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${page === currentPage
+                                            ? 'bg-primary text-white hover:bg-primary/90'
+                                            : 'border border-[#dedbe6] bg-white text-[#131118] hover:bg-gray-50'
+                                            }`}
                                     >
                                         {page}
                                     </button>
@@ -198,4 +333,4 @@ function TeamMembers() {
     )
 }
 
-export default TeamMembers;
+export default Users;
