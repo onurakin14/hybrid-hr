@@ -11,8 +11,8 @@ function TeamMembers() {
     const [limit, setLimit] = useState(6);
     const [skip, setSkip] = useState(0);
 
-    const [pageCount, setPageCount] = useState<number>();
-    const [userCount, setUserCount] = useState<number>();
+    const [pageCount, setPageCount] = useState<number>(1);
+    const [userCount, setUserCount] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
 
     useEffect(() => {
@@ -30,12 +30,29 @@ function TeamMembers() {
     }
 
     const handlePreviousPageButton = () => {
-        setSkip(skip - limit); getUsers();
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+            setSkip(skip - limit);
+            getUsers();
+        }
     }
 
     const handleNextPageButton = () => {
-        setSkip(skip + limit); getUsers();
+        if (currentPage < pageCount) {
+            setCurrentPage(currentPage + 1);
+            setSkip(skip + limit);
+            getUsers();
+        }
     }
+
+    useEffect(() => {
+        setSkip((currentPage - 1) * limit);
+        getUsers();
+    }, [currentPage]);
+
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(pageCount, currentPage + 2);
+    const pages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
     return (
         <React.Fragment>
@@ -148,22 +165,27 @@ function TeamMembers() {
                         {/* Pagination Footer */}
                         <div className="flex items-center justify-between border-t border-[#dedbe6] px-6 py-4 bg-gray-50/50">
                             <p className="text-sm text-[#6b6189]">
-                                Showing <span className="font-medium text-[#131118]">{currentPage}</span> to <span className="font-medium text-[#131118]">{limit}</span> of <span className="font-medium text-[#131118]">{userCount}</span> results
+                                Showing <span className="font-medium text-[#131118]">{(currentPage - 1) * limit + 1}</span> to <span className="font-medium text-[#131118]">{Math.min(currentPage * limit, userCount)}</span> of <span className="font-medium text-[#131118]">{userCount}</span> results
                             </p>
                             <div className="flex items-center gap-2">
                                 <button onClick={handlePreviousPageButton} className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 disabled:opacity-50 transition-colors">
                                     Previous
                                 </button>
-                                <button className="flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors">
-                                    {currentPage}
-                                </button>
-                                <button className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 transition-colors">
-                                    2
-                                </button>
-                                <button className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 transition-colors">
-                                    3
-                                </button>
-                                <span className="text-[#6b6189] px-1">...</span>
+                                {startPage > 1 && <span className="text-[#6b6189] px-1">...</span>}
+                                {pages.map(page => (
+                                    <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                                            page === currentPage
+                                                ? 'bg-primary text-white hover:bg-primary/90'
+                                                : 'border border-[#dedbe6] bg-white text-[#131118] hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                                {endPage < pageCount && <span className="text-[#6b6189] px-1">...</span>}
                                 <button onClick={handleNextPageButton} className="flex items-center justify-center rounded-lg border border-[#dedbe6] bg-white px-3 py-1.5 text-sm font-medium text-[#131118] hover:bg-gray-50 transition-colors">
                                     Next
                                 </button>
