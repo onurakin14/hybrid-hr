@@ -24,7 +24,14 @@ export interface User {
     macAddress: string;
     university: string;
     bank: {};
-    company: {};
+    company: {
+        title: string;
+        department: string;
+        address: {
+            state: string;
+            stateCode: string;
+        }
+    };
     ein: string;
     ssn: string;
     userAgent: string;
@@ -65,14 +72,14 @@ export const fetchUsersByPage = createAsyncThunk<User[], { limit?: number, skip?
 
 export const fetchUserById = createAsyncThunk(
     "users/fetchUserById", async (id: number) => {
-        const res = await axios.get<{ user: User }>(`https://dummyjson.com/users/${id}`);
-        return res.data.user;
+        const res = await axios.get<User>(`https://dummyjson.com/users/${id}`);
+        return res.data;
     }
 );
 
 export const createUser = createAsyncThunk(
     "users/createUser", async (userData: User) => {
-        const res = await axios.post("https://dummyjson.com/users", userData);
+        const res = await axios.post("https://dummyjson.com/users/add", userData);
         return res.data;
     }
 );
