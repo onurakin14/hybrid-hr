@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Candidate {
   id: number;
@@ -13,50 +14,125 @@ interface Candidate {
   rating: number;
 }
 
+interface Comment {
+  postId: number;
+  id: number;
+  name: string;
+  email: string;
+  body: string;
+}
+
+interface Post {
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+}
+
+interface JobDescription {
+  title: string;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+}
+
 export default function JobDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [jobDescription, setJobDescription] = useState<JobDescription | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
 
-  const candidates: Candidate[] = [
-    {
-      id: 1,
-      name: "Sarah Jenkins",
-      email: "sarah.j@example.com",
-      avatar: "https://i.pravatar.cc/150?img=1",
-      appliedDate: "Oct 24, 2023",
-      stage: "Interviewing",
-      rating: 4,
-    },
-    {
-      id: 2,
-      name: "Michael Kim",
-      email: "m.kim@design.co",
-      initials: "MK",
-      appliedDate: "Oct 22, 2023",
-      stage: "Screening",
-      rating: 3,
-    },
-    {
-      id: 3,
-      name: "Emily Chen",
-      email: "chen.emily@uxmail.com",
-      avatar: "https://i.pravatar.cc/150?img=5",
-      appliedDate: "Oct 21, 2023",
-      stage: "Applied",
-      rating: 0,
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Candidates verilerini çek
+        const commentsResponse = await fetch(
+          "https://jsonplaceholder.typicode.com/comments",
+        );
+        const comments: Comment[] = await commentsResponse.json();
+
+        // Job Description verilerini çek
+        const postsResponse = await fetch(
+          "https://jsonplaceholder.typicode.com/posts",
+        );
+        const posts: Post[] = await postsResponse.json();
+
+        // İlk post'u al ve job description'a dönüştür
+        const firstPost = posts[0];
+        const sentences = firstPost.body.split("\n").filter((s) => s.trim());
+
+        setJobDescription({
+          title: firstPost.title,
+          description: sentences.slice(0, 2).join(" "),
+          responsibilities: sentences
+            .slice(2, 6)
+            .map((s, i) => s.trim() || `Responsibility ${i + 1}`),
+          requirements: sentences
+            .slice(6, 10)
+            .map((s, i) => s.trim() || `Requirement ${i + 1}`),
+        });
+
+        // İlk 10 yorumu adaylara dönüştür
+        const formattedCandidates: Candidate[] = comments
+          .slice(0, 10)
+          .map((comment, index) => {
+            const stages: Array<
+              "Applied" | "Screening" | "Interviewing" | "Offer"
+            > = ["Applied", "Screening", "Interviewing", "Offer"];
+            const randomStage =
+              stages[Math.floor(Math.random() * stages.length)];
+            const randomRating = Math.floor(Math.random() * 6);
+
+            const nameParts = comment.name.split(" ");
+            const initials =
+              nameParts.length > 1
+                ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+                : comment.name.substring(0, 2).toUpperCase();
+
+            const randomDays = Math.floor(Math.random() * 30);
+            const date = new Date();
+            date.setDate(date.getDate() - randomDays);
+            const appliedDate = date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+
+            return {
+              id: comment.id,
+              name: comment.name,
+              email: comment.email,
+              initials: initials,
+              appliedDate: appliedDate,
+              stage: randomStage,
+              rating: randomRating,
+            };
+          });
+
+        setCandidates(formattedCandidates);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const getStageColor = (stage: string) => {
     switch (stage) {
       case "Interviewing":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+        return "bg-blue-100 text-blue-800";
       case "Screening":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+        return "bg-amber-100 text-amber-800";
       case "Applied":
-        return "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300";
+        return "bg-slate-100 text-slate-800";
       case "Offer":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+        return "bg-green-100 text-green-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -68,8 +144,8 @@ export default function JobDetailPage() {
         {[1, 2, 3, 4, 5].map((star) => (
           <span
             key={star}
-            className={`material-symbols-outlined text-[18px] ${
-              star <= rating ? "filled" : "text-slate-300 dark:text-slate-600"
+            className={`material-symbols-outlined text-[16px] ${
+              star <= rating ? "filled" : "text-slate-300"
             }`}
           >
             star
@@ -78,6 +154,15 @@ export default function JobDetailPage() {
       </div>
     );
   };
+
+  const pipelineStats = {
+    applied: candidates.filter((c) => c.stage === "Applied").length,
+    screening: candidates.filter((c) => c.stage === "Screening").length,
+    interviewing: candidates.filter((c) => c.stage === "Interviewing").length,
+    offer: candidates.filter((c) => c.stage === "Offer").length,
+  };
+
+  const totalCandidates = candidates.length || 1;
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#f6f6f8]">
@@ -95,7 +180,7 @@ export default function JobDetailPage() {
           </button>
           <span className="mx-2">/</span>
           <span className="text-slate-800 font-medium">
-            Senior Product Designer
+            {jobDescription?.title || "Senior Product Designer"}
           </span>
         </nav>
 
@@ -104,7 +189,7 @@ export default function JobDetailPage() {
           <div>
             <div className="flex flex-wrap items-center gap-3 mb-3">
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
-                Senior Product Designer
+                {jobDescription?.title || "Senior Product Designer"}
               </h1>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -165,56 +250,33 @@ export default function JobDetailPage() {
                 </span>
                 Job Description
               </h2>
-              <div className="text-slate-600 text-[15px] leading-relaxed space-y-4">
-                <p>
-                  We are seeking a talented and experienced Senior Product
-                  Designer to join our growing Product team. In this role, you
-                  will be responsible for defining the user experience for our
-                  core enterprise platform, working closely with product
-                  managers, engineers, and researchers to build intuitive and
-                  impactful solutions.
-                </p>
-                <h3 className="text-[15px] font-bold text-slate-900 mt-6 mb-3">
-                  Key Responsibilities
-                </h3>
-                <ul className="list-disc pl-5 space-y-2 marker:text-[#4f46e5]">
-                  <li>
-                    Lead design projects across the entire product lifecycle and
-                    multiple product launches.
-                  </li>
-                  <li>
-                    Partner closely with engineering and product management to
-                    find elegant but practical solutions to design challenges.
-                  </li>
-                  <li>
-                    Create wireframes, storyboards, user flows, process flows,
-                    and site maps to communicate interaction and design ideas
-                    effectively.
-                  </li>
-                  <li>
-                    Conduct user research and evaluate user feedback to enhance
-                    the usability of the product.
-                  </li>
-                </ul>
-                <h3 className="text-[15px] font-bold text-slate-900 mt-6 mb-3">
-                  Requirements
-                </h3>
-                <ul className="list-disc pl-5 space-y-2 marker:text-[#4f46e5]">
-                  <li>
-                    5+ years of experience in product design, UI/UX, or related
-                    field.
-                  </li>
-                  <li>
-                    A strong portfolio demonstrating your ability to solve
-                    complex problems with simple, elegant design.
-                  </li>
-                  <li>Proficiency in Figma, Sketch, or Adobe XD.</li>
-                  <li>
-                    Experience with design systems and maintaining consistency
-                    across a platform.
-                  </li>
-                </ul>
-              </div>
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4f46e5]"></div>
+                </div>
+              ) : jobDescription ? (
+                <div className="text-slate-600 text-[15px] leading-relaxed space-y-4">
+                  <p>{jobDescription.description}</p>
+                  <h3 className="text-[15px] font-bold text-slate-900 mt-6 mb-3">
+                    Key Responsibilities
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-2 marker:text-[#4f46e5]">
+                    {jobDescription.responsibilities.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                  <h3 className="text-[15px] font-bold text-slate-900 mt-6 mb-3">
+                    Requirements
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-2 marker:text-[#4f46e5]">
+                    {jobDescription.requirements.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p className="text-slate-500">No job description available.</p>
+              )}
             </section>
 
             {/* Candidates Table */}
@@ -232,7 +294,7 @@ export default function JobDetailPage() {
                       search
                     </span>
                     <input
-                      className="pl-10 pr-4 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] outline-none w-full sm:w-64"
+                      className="pl-10 pr-4 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] outline-none w-full sm:w-64 text-slate-900"
                       placeholder="Search..."
                       type="text"
                     />
@@ -245,85 +307,83 @@ export default function JobDetailPage() {
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="text-xs text-slate-500 uppercase bg-slate-50/80 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3.5 font-semibold text-left">
-                        Name
-                      </th>
-                      <th className="px-6 py-3.5 font-semibold text-left">
-                        Applied Date
-                      </th>
-                      <th className="px-6 py-3.5 font-semibold text-left">
-                        Stage
-                      </th>
-                      <th className="px-6 py-3.5 font-semibold text-left">
-                        Rating
-                      </th>
-                      <th className="px-6 py-3.5 font-semibold text-right w-12"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {candidates.map((candidate) => (
-                      <tr
-                        key={candidate.id}
-                        className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            {candidate.avatar ? (
-                              <img
-                                alt={candidate.name}
-                                className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm"
-                                src={candidate.avatar}
-                              />
-                            ) : (
+                {loading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4f46e5]"></div>
+                  </div>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead className="text-xs text-slate-500 uppercase bg-slate-50/80 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3.5 font-semibold text-left">
+                          Name
+                        </th>
+                        <th className="px-6 py-3.5 font-semibold text-left">
+                          Applied Date
+                        </th>
+                        <th className="px-6 py-3.5 font-semibold text-left">
+                          Stage
+                        </th>
+                        <th className="px-6 py-3.5 font-semibold text-left">
+                          Rating
+                        </th>
+                        <th className="px-6 py-3.5 font-semibold text-right w-12"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {candidates.map((candidate) => (
+                        <tr
+                          key={candidate.id}
+                          className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold ring-2 ring-white shadow-sm">
                                 {candidate.initials}
                               </div>
-                            )}
-                            <div>
-                              <div className="font-medium text-slate-900 text-[15px]">
-                                {candidate.name}
-                              </div>
-                              <div className="text-xs text-slate-500">
-                                {candidate.email}
+                              <div>
+                                <div className="font-medium text-slate-900 text-[15px]">
+                                  {candidate.name}
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                  {candidate.email}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-slate-600 text-[14px]">
-                          {candidate.appliedDate}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStageColor(
-                              candidate.stage,
-                            )}`}
-                          >
-                            {candidate.stage}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          {candidate.rating > 0 ? (
-                            renderStars(candidate.rating)
-                          ) : (
-                            <span className="text-xs text-slate-400 italic">
-                              Not rated
+                          </td>
+                          <td className="px-6 py-4 text-slate-600 text-[14px]">
+                            {candidate.appliedDate}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStageColor(
+                                candidate.stage,
+                              )}`}
+                            >
+                              {candidate.stage}
                             </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-slate-400 hover:text-[#4f46e5] p-1 rounded transition-colors opacity-0 group-hover:opacity-100">
-                            <span className="material-symbols-outlined text-[20px]">
-                              chevron_right
-                            </span>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          </td>
+                          <td className="px-6 py-4">
+                            {candidate.rating > 0 ? (
+                              renderStars(candidate.rating)
+                            ) : (
+                              <span className="text-xs text-slate-400 italic">
+                                Not rated
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button className="text-slate-400 hover:text-[#4f46e5] p-1 rounded transition-colors opacity-0 group-hover:opacity-100">
+                              <span className="material-symbols-outlined text-[20px]">
+                                chevron_right
+                              </span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
               <div className="px-6 py-4 border-t border-gray-200 flex justify-center bg-slate-50/30">
                 <button className="text-sm font-semibold text-[#4f46e5] hover:text-[#4338ca] transition-colors flex items-center gap-1 py-1.5">
@@ -345,10 +405,30 @@ export default function JobDetailPage() {
               </h3>
               <div className="space-y-5">
                 {[
-                  { label: "Applied", count: 24, color: "#4f46e5", width: 100 },
-                  { label: "Screening", count: 8, color: "#f59e0b", width: 33 },
-                  { label: "Interview", count: 3, color: "#3b82f6", width: 12 },
-                  { label: "Offer", count: 0, color: "#10b981", width: 0 },
+                  {
+                    label: "Applied",
+                    count: pipelineStats.applied,
+                    color: "#4f46e5",
+                    width: (pipelineStats.applied / totalCandidates) * 100,
+                  },
+                  {
+                    label: "Screening",
+                    count: pipelineStats.screening,
+                    color: "#f59e0b",
+                    width: (pipelineStats.screening / totalCandidates) * 100,
+                  },
+                  {
+                    label: "Interview",
+                    count: pipelineStats.interviewing,
+                    color: "#3b82f6",
+                    width: (pipelineStats.interviewing / totalCandidates) * 100,
+                  },
+                  {
+                    label: "Offer",
+                    count: pipelineStats.offer,
+                    color: "#10b981",
+                    width: (pipelineStats.offer / totalCandidates) * 100,
+                  },
                 ].map((item) => (
                   <div key={item.label} className="group">
                     <div className="flex items-center justify-between text-sm mb-2">
@@ -375,28 +455,36 @@ export default function JobDetailPage() {
 
             {/* Hiring Team */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-sm font-bold text-slate-900 mb-4">
+              <h3 className="text-sm font-semibold text-slate-900 mb-4">
                 Hiring Team
               </h3>
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex -space-x-3">
-                  <div className="inline-block h-10 w-10 rounded-full ring-2 ring-white bg-gradient-to-br from-orange-400 to-pink-400 flex items-center justify-center text-sm font-bold text-white shadow-md"></div>
-                  <div className="inline-block h-10 w-10 rounded-full ring-2 ring-white bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-md"></div>
-                  <div className="inline-block h-10 w-10 rounded-full ring-2 ring-white bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600 shadow-sm">
+                <div className="flex -space-x-2 overflow-hidden">
+                  <img
+                    alt=""
+                    className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
+                  />
+                  <img
+                    alt=""
+                    className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
+                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
+                  />
+                  <div className="inline-flex h-10 w-10 rounded-full ring-2 ring-white bg-slate-100 items-center justify-center text-xs font-semibold text-slate-600">
                     +2
                   </div>
                 </div>
               </div>
-              <div className="text-sm text-slate-600">
+              <div className="text-sm text-slate-500">
                 Managed by{" "}
                 <a
-                  className="text-[#4f46e5] hover:underline font-semibold"
+                  className="text-[#4f46e5] hover:underline font-medium"
                   href="#"
                 >
                   Alex Morgan
                 </a>
               </div>
-              <button className="mt-4 w-full py-2.5 text-sm font-semibold text-slate-700 border border-gray-200 rounded-xl hover:bg-slate-50 transition-colors">
+              <button className="mt-4 w-full py-2 text-sm font-medium text-slate-700 border border-gray-200 rounded-lg hover:bg-slate-50 transition-colors">
                 Manage Team
               </button>
             </div>
@@ -429,7 +517,11 @@ export default function JobDetailPage() {
                       href="#"
                     >
                       <div
-                        className={`h-10 w-10 rounded-lg bg-${doc.color}-50 text-${doc.color}-600 flex items-center justify-center shrink-0`}
+                        className={`h-10 w-10 rounded-lg ${
+                          doc.color === "blue"
+                            ? "bg-blue-50 text-blue-600"
+                            : "bg-indigo-50 text-indigo-600"
+                        } flex items-center justify-center shrink-0`}
                       >
                         <span className="material-symbols-outlined text-[20px]">
                           {doc.icon}
