@@ -76,6 +76,28 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                     </div>
                                 )}
                             </div>
+                            {/* <!-- Recruitment --> */}
+                            <div>
+                                <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('recruitment') ? 'bg-primary-light' : 'nav-inactive'}`}>
+                                    <button onClick={() => router.push('/admin/recruitment')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('recruitment') ? 'text-primary' : 'text-slate-500'}`} title="Recruitment">
+                                        <span className="material-symbols-outlined fill-1 group-hover:text-primary transition-colors">group</span>
+                                        <span className="text-sm font-medium">Recruitment</span>
+                                    </button>
+                                    {isSidebarOpen && (
+                                        <button onClick={() => setExpandedMenu(expandedMenu === 'recruitment' ? null : 'recruitment')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
+                                            <span className="material-symbols-outlined text-[18px] transition-transform opacity-60" style={{ transform: expandedMenu === 'recruitment' ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
+                                        </button>
+                                    )}
+                                </div>
+                                {isSidebarOpen && expandedMenu === 'recruitment' && (
+                                    <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
+                                        <button onClick={() => router.push('/admin/recruitment/overview')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('overview') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                            <span className="material-symbols-outlined text-[16px]">overview</span>
+                                            Overview
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                             {/* <!-- Projects --> */}
                             <div>
                                 <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('projects') ? 'bg-primary-light' : 'nav-inactive'}`}>
