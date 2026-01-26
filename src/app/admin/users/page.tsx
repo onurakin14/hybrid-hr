@@ -3,6 +3,7 @@ import { createUser, fetchUsers, fetchUsersByPage, User } from "@/lib/features/u
 import { useAppDispatch } from "../../../lib/hooks";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function Users() {
 
@@ -25,13 +26,13 @@ function Users() {
             const data = res.payload as User[];
             setUserCount(data.length);
             setPageCount(Math.ceil(data.length / limit));
-        }).then(getUsers).catch(console.error);
+        }).then(getUsers);
     }, [dispatch]);
 
     const getUsers = () => {
         dispatch(fetchUsersByPage({ limit, skip })).then(res => {
             const data = res.payload as User[]; setUsers(data);
-        }).catch(console.error);
+        });
     }
 
     const handlePreviousPageButton = () => {
@@ -61,9 +62,7 @@ function Users() {
 
     const handleUserFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-
         setNewUser((data: any) => ({ ...data, [name]: value }));
-        console.log(newUser);
     }
 
     const handleAddUser = () => {
@@ -243,58 +242,68 @@ function Users() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#dedbe6]">
-                                    {users?.map((item, index) => {
-                                        return (
-                                            <tr key={index} className="hover:bg-gray-50 transition-colors group">
-                                                <td onClick={() => router.push(`users/${item.id}`)} className="px-6 py-4 cursor-pointer">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white shadow-sm" data-alt="Portrait of Jane Doe" style={{ backgroundImage: `url(${item.image})` }}></div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[#131118] text-sm font-semibold">{item.firstName} {item.lastName}</span>
-                                                            <span className="text-[#6b6189] text-xs">{item.email}</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset capitalize 
+                                    {users && users.length > 0 ? (
+                                        users.map((item, index) => (
+                                            item?.id ? (
+                                                <tr key={index} className="hover:bg-gray-50 transition-colors group">
+                                                    <td className="px-6 py-4 cursor-pointer">
+                                                        <Link href={`/admin/users/${item.id}`}>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white shadow-sm" data-alt="Portrait of Jane Doe" style={{ backgroundImage: `url(${item.image})` }}></div>
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[#131118] text-sm font-semibold">{item.firstName} {item.lastName}</span>
+                                                                    <span className="text-[#6b6189] text-xs">{item.email}</span>
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset capitalize 
                                                         ${item.role == "admin" && "bg-purple-50 text-purple-700 ring-purple-700/10"}
                                                         ${item.role == "moderator" && "bg-blue-50 text-blue-700 ring-blue-700/10"}
                                                         ${item.role == "user" && "bg-gray-100 text-gray-600 ring-gray-500/10"}`}>
-                                                        {item.role}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="relative flex h-2.5 w-2.5">
-                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                                            {item.role}
                                                         </span>
-                                                        <span className="text-sm font-medium text-[#131118]">Active</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="flex -space-x-2 overflow-hidden">
-                                                            <div className="inline-block size-6 rounded-full ring-2 ring-white bg-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600">P1</div>
-                                                            <div className="inline-block size-6 rounded-full ring-2 ring-white bg-pink-100 flex items-center justify-center text-[10px] font-bold text-pink-600">P2</div>
-                                                            <div className="inline-block size-6 rounded-full ring-2 ring-white bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-600">P3</div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="relative flex h-2.5 w-2.5">
+                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                                            </span>
+                                                            <span className="text-sm font-medium text-[#131118]">Active</span>
                                                         </div>
-                                                        <span className="text-xs text-[#6b6189] font-medium">+9 others</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button className="p-1.5 rounded-md text-[#6b6189] hover:text-primary hover:bg-primary/5 transition-colors" title="Edit">
-                                                            <span className="material-symbols-outlined text-[20px]">edit</span>
-                                                        </button>
-                                                        <button className="p-1.5 rounded-md text-[#6b6189] hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete">
-                                                            <span className="material-symbols-outlined text-[20px]">delete</span>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })}
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex -space-x-2 overflow-hidden">
+                                                                <div className="inline-block size-6 rounded-full ring-2 ring-white bg-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600">P1</div>
+                                                                <div className="inline-block size-6 rounded-full ring-2 ring-white bg-pink-100 flex items-center justify-center text-[10px] font-bold text-pink-600">P2</div>
+                                                                <div className="inline-block size-6 rounded-full ring-2 ring-white bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-600">P3</div>
+                                                            </div>
+                                                            <span className="text-xs text-[#6b6189] font-medium">+9 others</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button className="p-1.5 rounded-md text-[#6b6189] hover:text-primary hover:bg-primary/5 transition-colors" title="Edit">
+                                                                <span className="material-symbols-outlined text-[20px]">edit</span>
+                                                            </button>
+                                                            <button className="p-1.5 rounded-md text-[#6b6189] hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete">
+                                                                <span className="material-symbols-outlined text-[20px]">delete</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ) : null
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={5} className="text-center py-4">
+                                                Loading users...
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>

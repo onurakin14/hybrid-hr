@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { logout } from "../../lib/features/users/authSlice";
+import { logout, setUser } from "../../lib/features/users/authSlice";
 
 function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 
@@ -16,9 +16,16 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const [isUserProfileOpen, setUserProfileOpen] = useState(false);
     const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
+    useEffect(() => {
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) dispatch(setUser(JSON.parse(savedUser)));
+        else router.push("/login");
+    }, [dispatch, router]);
+
     const handleLogout = () => {
         dispatch(logout());
-        router.push('/login');
+        localStorage.removeItem("user");
+        router.push("/login");
     };
 
     const isActive = (href: string): boolean => {
@@ -152,7 +159,7 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                             <span className="material-symbols-outlined text-[16px]">person_add</span>
                                             Add User
                                         </button>
-                                        <button onClick={() => router.push('users')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('users') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('/admin/users')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('users') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
                                             <span className="material-symbols-outlined text-[16px]">admin_panel_settings</span>
                                             Permissions
                                         </button>
@@ -191,12 +198,12 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                             </div>
                             <div className="h-px bg-slate-200 my-2"></div>
                             {/* <!-- Support --> */}
-                            <button onClick={() => router.push('/admin/help')} className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors group ${isActive('help') ? 'bg-primary-light text-primary' : 'text-slate-500 nav-inactive'}`} title="Support">
+                            <button className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors group ${isActive('help') ? 'bg-primary-light text-primary' : 'text-slate-500 nav-inactive'}`} title="Support">
                                 <span className="material-symbols-outlined">bar_chart</span>
                                 <span className="text-sm font-semibold">Reports</span>
                             </button>
                             {/* <!-- Settings --> */}
-                            <button onClick={() => router.push('/admin/settings')} className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors group ${isActive('settings') ? 'bg-primary-light text-primary' : 'text-slate-500 nav-inactive'}`} title="Settings">
+                            <button className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors group ${isActive('settings') ? 'bg-primary-light text-primary' : 'text-slate-500 nav-inactive'}`} title="Settings">
                                 <span className="material-symbols-outlined">settings</span>
                                 <span className="text-sm font-semibold">Settings</span>
                             </button>
@@ -204,11 +211,11 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                         <div className="p-4 mt-auto">
                             <div className="flex items-center gap-3">
                                 <button className="group flex items-center justify-center p-0.5 rounded-full ring-2 ring-transparent hover:ring-primary/20 transition-all focus:outline-none shrink-0">
-                                    <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar" style={{ backgroundImage: `url('${currentUser?.image}')` }}></div>
+                                    <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar" style={{ backgroundImage: `url('${currentUser?.image || ""}')` }}></div>
                                 </button>
                                 {isSidebarOpen && (
                                     <div className="flex flex-col min-w-0">
-                                        <span className="text-sm font-semibold text-slate-900 leading-none truncate">{`${currentUser?.firstName} ${currentUser?.lastName}`}</span>
+                                        <span className="text-sm font-semibold text-slate-900 leading-none truncate">{`${currentUser?.firstName || ""} ${currentUser?.lastName || ""}`}</span>
                                         <span className="text-xs text-slate-500 mt-1">Admin</span>
                                     </div>
                                 )}
@@ -240,7 +247,7 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                         <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white"></span>
                                     </button>
                                     <button onClick={() => setUserProfileOpen(!isUserProfileOpen)} className="flex items-center justify-center p-0.5 rounded-full ring-2 ring-transparent hover:ring-primary/20 transition-all focus:outline-none shrink-0">
-                                        <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar" style={{ backgroundImage: `url('${currentUser?.image}')` }}></div>
+                                        <div className="size-10 rounded-full bg-cover bg-center shadow-inner" data-alt="User profile avatar" style={{ backgroundImage: `url('${currentUser?.image || ""}')` }}></div>
                                     </button>
                                     {/* Dropdown Menu */}
                                     <div className={`absolute right-0 top-full mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-50 ${isUserProfileOpen ? 'block' : 'hidden'}`}>

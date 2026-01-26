@@ -1,26 +1,29 @@
 "use client"
 import { loginUser, AuthUser } from "../../lib/features/users/authSlice";
-import { useAppDispatch } from "../../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function Login() {
 
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const { user, loading, error } = useAppSelector((state) => state.auth);
 
     const [username, setUsername] = useState("emilys");
     const [password, setPassword] = useState("emilyspass");
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault(); // Form default davranışını engelle
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        dispatch(loginUser({ username, password }));
+    };
 
-        dispatch(loginUser({ username, password })).then(res => {
-            const data = res.payload as AuthUser;
-            if (data.message) alert(data.message);
-            else router.push("/admin/dashboard");
-        }).catch(err => console.error(err));
-    }
+    useEffect(() => {
+        if (!loading && user) {
+            localStorage.setItem("user", JSON.stringify(user));
+            router.push("/admin/dashboard");
+        }
+    }, [user, loading, router]);
 
     return (
         <React.Fragment>
@@ -75,10 +78,11 @@ function Login() {
                             </div>
                             {/* <!-- Submit Button --> */}
                             <button className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200"
-                                type="submit">
-                                Sign In
+                                type="submit" disabled={loading}>
+                                {loading ? "Loading..." : "Sign In"}
                             </button>
                         </form>
+                        {error && <p className="text-center text-red-500 mt-2">{error}</p>}
                     </div>
                     {/* <!-- Footer --> */}
                     <p className="mt-8 text-center text-sm text-gray-500">

@@ -14,13 +14,13 @@ export interface AuthUser {
     message?: string;
 }
 
-interface UserState {
+interface AuthState {
     user: AuthUser | null;
     loading: boolean;
     error: string | null;
 }
 
-const initialState: UserState = {
+const initialState: AuthState = {
     user: null,
     loading: false,
     error: null,
@@ -29,14 +29,21 @@ const initialState: UserState = {
 export const loginUser = createAsyncThunk<AuthUser, { username: string; password: string }>(
     "auth/loginUser", async ({ username, password }) => {
         const res = await axios.post("https://dummyjson.com/user/login", { username, password });
+        if (typeof window !== "undefined") {
+            localStorage.setItem("user", JSON.stringify(res.data));
+        }
         return res.data;
     }
 );
+
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
+        setUser: (state, action: PayloadAction<AuthUser | null>) => {
+            state.user = action.payload;
+        },
         logout: (state) => {
             state.user = null;
             state.error = null;
@@ -54,10 +61,10 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                state.error = action.error.message || "Login failed!";
             });
     },
 });
 
-export const { logout } = authSlice.actions;
+export const { setUser, logout } = authSlice.actions;
 export default authSlice.reducer;

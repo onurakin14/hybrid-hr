@@ -11,19 +11,20 @@ function UserDetail() {
     const [user, setUser] = useState<User>();
 
     useEffect(() => {
-        dispatch(fetchUserById(Number(id))).then(res => {
+        dispatch(fetchUserById(id as string)).then((res) => {
             const data = res.payload as User; setUser(data);
-        }).catch(console.error);
-    }, []);
+        });
+    }, [id, dispatch]);
 
+    if (!user) return (<></>)
     return (
         <React.Fragment>
             <div className="flex-1 max-w-[1440px] overflow-y-auto w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Breadcrumbs */}
                 <div className="flex items-center gap-2 mb-6 text-sm">
-                    <a className="text-[#6b6189] hover:text-primary font-medium" href="#">Home</a>
+                    <a className="text-[#6b6189] hover:text-primary font-medium" href="/admin/dashboard">Home</a>
                     <span className="text-[#9ca3af] material-symbols-outlined text-[16px]">chevron_right</span>
-                    <a className="text-[#6b6189] hover:text-primary font-medium" href="#">Employees</a>
+                    <a className="text-[#6b6189] hover:text-primary font-medium" href="/admin/users">Employees</a>
                     <span className="text-[#9ca3af] material-symbols-outlined text-[16px]">chevron_right</span>
                     <span className="text-[#6b6189] font-semibold">{user?.firstName} {user?.lastName}</span>
                 </div>

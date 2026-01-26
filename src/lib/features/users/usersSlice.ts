@@ -71,7 +71,7 @@ export const fetchUsersByPage = createAsyncThunk<User[], { limit?: number, skip?
 );
 
 export const fetchUserById = createAsyncThunk(
-    "users/fetchUserById", async (id: number) => {
+    "users/fetchUserById", async (id: string) => {
         const res = await axios.get<User>(`https://dummyjson.com/users/${id}`);
         return res.data;
     }
