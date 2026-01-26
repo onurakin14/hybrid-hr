@@ -116,10 +116,6 @@ export default function TaskListView() {
           <div className="max-w-[1400px] mx-auto w-full flex flex-col gap-6">
             {/* Sayfa başlığı ve ana aksiyon */}
             <div className="flex flex-wrap justify-between items-end gap-4">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-[#131118] dark:text-white text-3xl font-bold tracking-tight">All Tasks</h2>
-                <p className="text-[#6b6189] dark:text-gray-400 text-base">Manage and track team progress across all projects.</p>
-              </div>
               <button 
                 onClick={() => dispatch(toggleCreate())}
                 className="flex items-center justify-center gap-2 h-10 px-5 bg-primary hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm shadow-indigo-200 dark:shadow-none transition-all"
