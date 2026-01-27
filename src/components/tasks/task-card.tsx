@@ -132,11 +132,11 @@ export default function TaskCard({ task }: TaskCardProps) {
         <div className="flex items-center justify-between">
           {/* Avatars */}
           <div className="flex items-center -space-x-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 text-white text-xs font-medium flex items-center justify-center border-2 border-white">
+            <div className="w-6 h-6 rounded-full bg-linear-to-br from-violet-400 to-violet-600 text-white text-xs font-medium flex items-center justify-center border-2 border-white">
               {task.id % 2 === 0 ? "JD" : "EY"}
             </div>
             {task.id % 3 === 0 && (
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 border-2 border-white" />
+              <div className="w-6 h-6 rounded-full bg-linear-to-br from-teal-400 to-teal-600 border-2 border-white" />
             )}
           </div>
 

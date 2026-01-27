@@ -19,7 +19,7 @@ export default function Column({
   const dispatch = useDispatch();
 
   return (
-    <div className="flex-shrink-0 w-72 bg-gray-50 rounded-2xl p-4 flex flex-col">
+    <div className="shrink-0 w-72 bg-gray-50 rounded-2xl p-4 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-sm">{title}</h3>

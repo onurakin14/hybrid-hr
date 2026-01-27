@@ -112,8 +112,8 @@ export default function TaskListView() {
       {/* Ana içerik alanı */}
       <main className="flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative w-full">
         {/* Üst bar - Başlık ve aksiyon butonu */}
-        <header className="flex-shrink-0 px-8 py-6 bg-background-light dark:bg-background-dark z-10">
-          <div className="max-w-[1400px] mx-auto w-full flex flex-col gap-6">
+        <header className="shrink-0 px-8 py-6 bg-background-light dark:bg-background-dark z-10">
+          <div className="max-w-350 mx-auto w-full flex flex-col gap-6">
             {/* Sayfa başlığı ve ana aksiyon */}
             <div className="flex flex-wrap justify-between items-end gap-4">
               <button 
@@ -129,7 +129,7 @@ export default function TaskListView() {
 
         {/* Kaydırılabilir içerik alanı */}
         <div className="flex-1 overflow-y-auto px-8 pb-8">
-          <div className="max-w-[1400px] mx-auto w-full flex flex-col gap-4">
+          <div className="max-w-350 mx-auto w-full flex flex-col gap-4">
             {/* Filtreler ve arama kartı */}
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-center sticky top-0 z-20">
               {/* Arama çubuğu */}
@@ -212,7 +212,7 @@ export default function TaskListView() {
                       <th className="p-4 w-10 text-center">
                         <input className="rounded border-gray-300 text-primary focus:ring-primary/20 cursor-pointer" type="checkbox"/>
                       </th>
-                      <th className="p-4 min-w-[240px]">Task Name</th>
+                      <th className="p-4 min-w-60">Task Name</th>
                       <th className="p-4 w-32">Status</th>
                       <th className="p-4 w-48">Assignee</th>
                       <th className="p-4 w-32">Due Date</th>
@@ -237,7 +237,7 @@ export default function TaskListView() {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            <div className="flex items-center justify-center size-6 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 text-white text-xs font-medium">
+                            <div className="flex items-center justify-center size-6 rounded-full bg-linear-to-br from-violet-400 to-violet-600 text-white text-xs font-medium">
                               {task.id % 2 === 0 ? "JD" : "EY"}
                             </div>
                             <span className="text-sm text-[#131118] dark:text-gray-200">

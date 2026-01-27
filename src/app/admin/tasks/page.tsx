@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { fetchTasks } from "@/lib/features/tasks/taskSlice";
 import Header from "@/components/tasks/tasks-header";
-import BoardView from "@/components/tasks/Board";
+import BoardView from "@/components/tasks/board";
 import CreateTaskModal from "@/components/tasks/create-task-modal";
 import TaskListView from "@/components/tasks/list";
 

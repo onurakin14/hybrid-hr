@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
+/* ================= EXISTING TYPES ================= */
 export type Priority = 'low' | 'medium' | 'high';
 export type TaskStatus = 'backlog' | 'todo' | 'in-progress' | 'done';
 
@@ -15,20 +16,46 @@ export interface Task {
   dueDate?: string;
 }
 
+/* ================= ✅ NEW TYPES (ADDED) ================= */
+export type SortField = 'priority' | 'todo';
+export type SortOrder = 'asc' | 'desc';
+
+interface TaskFilter {
+  status?: TaskStatus;
+  priority?: Priority;
+}
+
+/* ================= EXISTING STATE ================= */
 interface TasksState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
   isCreateOpen: boolean;
+
+  /* ✅ NEW STATE (ADDED) */
+  filter: TaskFilter;
+  sort: {
+    field: SortField | null;
+    order: SortOrder;
+  };
 }
 
+/* ================= INITIAL STATE ================= */
 const initialState: TasksState = {
   tasks: [],
   loading: false,
   error: null,
   isCreateOpen: false,
+
+  /* ✅ ADDED */
+  filter: {},
+  sort: {
+    field: null,
+    order: 'asc',
+  },
 };
 
+/* ================= EXISTING THUNKS ================= */
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const response = await fetch('https://dummyjson.com/todos?limit=20');
   const data = await response.json();
@@ -110,19 +137,26 @@ export const deleteTask = createAsyncThunk(
   }
 );
 
+/* ================= SLICE ================= */
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
+    /* ===== EXISTING REDUCERS (UNCHANGED) ===== */
     toggleCreate: (state) => {
       state.isCreateOpen = !state.isCreateOpen;
     },
-    moveTask: (state, action: PayloadAction<{ taskId: number; status: TaskStatus }>) => {
+
+    moveTask: (
+      state,
+      action: PayloadAction<{ taskId: number; status: TaskStatus }>
+    ) => {
       const task = state.tasks.find((t) => t.id === action.payload.taskId);
       if (task) {
         task.status = action.payload.status;
       }
     },
+
     toggleTaskComplete: (state, action: PayloadAction<number>) => {
       const task = state.tasks.find((t) => t.id === action.payload);
       if (task) {
@@ -132,7 +166,32 @@ const tasksSlice = createSlice({
         }
       }
     },
+
+    /* ===== ✅ NEW REDUCERS (ADDED) ===== */
+    setFilter: (state, action: PayloadAction<TaskFilter>) => {
+      state.filter = {
+        ...state.filter,   // 👈 mevcut filtreleri koru
+        ...action.payload, // 👈 yeni geleni ekle / overwrite et
+      };
+    },
+
+
+    clearFilter: (state) => {
+      state.filter = {};
+    },
+
+      setSort: (state, action: PayloadAction<{ field: SortField }>) => {
+      if (state.sort.field === action.payload.field) {
+        state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sort.field = action.payload.field;
+        state.sort.order = 'asc';
+      }
+    },
+
   },
+
+  /* ===== EXISTING EXTRA REDUCERS (UNCHANGED) ===== */
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -162,5 +221,16 @@ const tasksSlice = createSlice({
   },
 });
 
-export const { toggleCreate, moveTask, toggleTaskComplete } = tasksSlice.actions;
+/* ================= EXPORT ================= */
+export const {
+  toggleCreate,
+  moveTask,
+  toggleTaskComplete,
+
+  /* ✅ NEW EXPORTS */
+  setFilter,
+  clearFilter,
+  setSort,
+} = tasksSlice.actions;
+
 export default tasksSlice.reducer;
