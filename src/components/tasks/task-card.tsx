@@ -27,7 +27,6 @@ export default function TaskCard({ task }: TaskCardProps) {
     Frontend: "bg-cyan-100 text-cyan-700",
   };
 
-  /* Görsel simülasyonu */
   const showImage = task.id % 4 === 0;
   const imageUrl = showImage
     ? "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=400"
@@ -132,11 +131,11 @@ export default function TaskCard({ task }: TaskCardProps) {
         <div className="flex items-center justify-between">
           {/* Avatars */}
           <div className="flex items-center -space-x-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 text-white text-xs font-medium flex items-center justify-center border-2 border-white">
+            <div className="w-6 h-6 rounded-full bg-linear-to-br from-violet-400 to-violet-600 text-white text-xs font-medium flex items-center justify-center border-2 border-white">
               {task.id % 2 === 0 ? "JD" : "EY"}
             </div>
             {task.id % 3 === 0 && (
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 border-2 border-white" />
+              <div className="w-6 h-6 rounded-full bg-linear-to-br from-teal-400 to-teal-600 border-2 border-white" />
             )}
           </div>
 
@@ -149,8 +148,7 @@ export default function TaskCard({ task }: TaskCardProps) {
             />
           )}
         </div>
-
-        {/* Progress – SADECE IN PROGRESS */}
+        
         {task.status === "in-progress" && (
           <div className="mt-3">
             <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">

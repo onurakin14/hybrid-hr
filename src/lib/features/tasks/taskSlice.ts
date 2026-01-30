@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-
 export type Priority = 'low' | 'medium' | 'high';
 export type TaskStatus = 'backlog' | 'todo' | 'in-progress' | 'done';
 
@@ -15,11 +14,24 @@ export interface Task {
   dueDate?: string;
 }
 
+export type SortField = 'priority' | 'todo';
+export type SortOrder = 'asc' | 'desc';
+
+interface TaskFilter {
+  status?: TaskStatus;
+  priority?: Priority;
+}
+
 interface TasksState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
   isCreateOpen: boolean;
+  filter: TaskFilter;
+  sort: {
+    field: SortField | null;
+    order: SortOrder;
+  };
 }
 
 const initialState: TasksState = {
@@ -27,6 +39,11 @@ const initialState: TasksState = {
   loading: false,
   error: null,
   isCreateOpen: false,
+  filter: {},
+  sort: {
+    field: null,
+    order: 'asc',
+  },
 };
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
@@ -110,6 +127,7 @@ export const deleteTask = createAsyncThunk(
   }
 );
 
+/* ================= SLICE ================= */
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -117,12 +135,17 @@ const tasksSlice = createSlice({
     toggleCreate: (state) => {
       state.isCreateOpen = !state.isCreateOpen;
     },
-    moveTask: (state, action: PayloadAction<{ taskId: number; status: TaskStatus }>) => {
+
+    moveTask: (
+      state,
+      action: PayloadAction<{ taskId: number; status: TaskStatus }>
+    ) => {
       const task = state.tasks.find((t) => t.id === action.payload.taskId);
       if (task) {
         task.status = action.payload.status;
       }
     },
+
     toggleTaskComplete: (state, action: PayloadAction<number>) => {
       const task = state.tasks.find((t) => t.id === action.payload);
       if (task) {
@@ -132,7 +155,30 @@ const tasksSlice = createSlice({
         }
       }
     },
+
+    setFilter: (state, action: PayloadAction<TaskFilter>) => {
+      state.filter = {
+        ...state.filter,  
+        ...action.payload, 
+      };
+    },
+
+
+    clearFilter: (state) => {
+      state.filter = {};
+    },
+
+      setSort: (state, action: PayloadAction<{ field: SortField }>) => {
+      if (state.sort.field === action.payload.field) {
+        state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sort.field = action.payload.field;
+        state.sort.order = 'asc';
+      }
+    },
+
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -162,5 +208,13 @@ const tasksSlice = createSlice({
   },
 });
 
-export const { toggleCreate, moveTask, toggleTaskComplete } = tasksSlice.actions;
+export const {
+  toggleCreate,
+  moveTask,
+  toggleTaskComplete,
+  setFilter,
+  clearFilter,
+  setSort,
+} = tasksSlice.actions;
+
 export default tasksSlice.reducer;
