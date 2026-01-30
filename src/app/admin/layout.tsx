@@ -40,8 +40,16 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                     <aside className={`${isSidebarOpen ? 'flex' : 'hidden'} md:flex fixed md:relative flex-col bg-[var(--background)] border-r border-light h-full shrink-0 z-20 transition-all duration-300 w-72`}>
                         {/* <!-- Logo Section --> */}
                         <div className="h-16 flex items-center justify-between px-6 border-b border-transparent">
-                            <div className="flex items-center gap-3 min-w-0">
-                                <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-white shrink-0">
+                            {sidebarOpen && (
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-white shrink-0">
+                                        <span className="material-symbols-outlined text-[20px]">grid_view</span>
+                                    </div>
+                                    <h1 className="text-lg font-bold tracking-tight text-slate-900 truncate">Enterprise App</h1>
+                                </div>
+                            )}
+                            {!sidebarOpen && (
+                                <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-white shrink-0 mx-auto">
                                     <span className="material-symbols-outlined text-[20px]">grid_view</span>
                                 </div>
                                 <h1 className="text-lg font-bold tracking-tight text-slate-900 truncate">Enterprise App</h1>
@@ -101,9 +109,9 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                             {/* <!-- Projects --> */}
                             <div>
                                 <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('projects') ? 'bg-primary-light' : 'nav-inactive'}`}>
-                                    <button onClick={() => router.push('/admin/projects')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('projects') ? 'text-primary' : 'text-slate-500'}`} title="Projects">
+                                    <button onClick={() => router.push('/admin/projects')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('projects') ? 'text-primary' : 'text-slate-500'} ${!sidebarOpen && 'justify-center'}`} title={!sidebarOpen ? 'Projects' : ''}>
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">folder_open</span>
-                                        <span className="text-sm font-medium">Projects</span>
+                                        {sidebarOpen && <span className="text-sm font-medium">Projects</span>}
                                     </button>
                                     {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'projects' ? null : 'projects')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
@@ -113,15 +121,15 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                 </div>
                                 {isSidebarOpen && expandedMenu === 'projects' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
-                                        <button onClick={() => router.push('/admin/projects')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('projects') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('projects')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">list</span>
                                             All Projects
                                         </button>
-                                        <button onClick={() => router.push('/admin/projects')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('projects') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('projects')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">add</span>
                                             New Project
                                         </button>
-                                        <button onClick={() => router.push('/admin/projects')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('projects') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('projects')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">archive</span>
                                             Archived
                                         </button>
@@ -131,9 +139,9 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                             {/* <!-- Tasks --> */}
                             <div>
                                 <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('tasks') ? 'bg-primary-light' : 'nav-inactive'}`}>
-                                    <button onClick={() => router.push('/admin/tasks')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('tasks') ? 'text-primary' : 'text-slate-500'}`} title="Tasks">
+                                    <button onClick={() => router.push('/admin/tasks')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('tasks') ? 'text-primary' : 'text-slate-500'} ${!sidebarOpen && 'justify-center'}`} title={!sidebarOpen ? 'Tasks' : ''}>
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">check_box</span>
-                                        <span className="text-sm font-medium">Tasks</span>
+                                        {sidebarOpen && <span className="text-sm font-medium">Tasks</span>}
                                     </button>
                                     {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'tasks' ? null : 'tasks')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
@@ -143,15 +151,15 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                 </div>
                                 {isSidebarOpen && expandedMenu === 'tasks' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
-                                        <button onClick={() => router.push('/admin/tasks')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('tasks') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('tasks')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">list</span>
                                             All Tasks
                                         </button>
-                                        <button onClick={() => router.push('/admin/tasks')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('tasks') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('tasks')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">done</span>
                                             Completed
                                         </button>
-                                        <button onClick={() => router.push('/admin/tasks')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('tasks') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('tasks')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">schedule</span>
                                             Pending
                                         </button>
@@ -161,9 +169,9 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                             {/* <!-- Users --> */}
                             <div>
                                 <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('users') ? 'bg-primary-light' : 'nav-inactive'}`}>
-                                    <button onClick={() => router.push('/admin/users')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('users') ? 'text-primary' : 'text-slate-500'}`} title="Users">
+                                    <button onClick={() => router.push('/admin/users')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('users') ? 'text-primary' : 'text-slate-500'} ${!sidebarOpen && 'justify-center'}`} title={!sidebarOpen ? 'Users' : ''}>
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">group</span>
-                                        <span className="text-sm font-medium">Users</span>
+                                        {sidebarOpen && <span className="text-sm font-medium">Users</span>}
                                     </button>
                                     {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'users' ? null : 'users')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
@@ -173,11 +181,11 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                 </div>
                                 {isSidebarOpen && expandedMenu === 'users' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
-                                        <button onClick={() => router.push('/admin/users')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('users') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('users')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">list</span>
                                             All Users
                                         </button>
-                                        <button onClick={() => router.push('/admin/users')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('users') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('users')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">person_add</span>
                                             Add User
                                         </button>
@@ -191,9 +199,9 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                             {/* <!-- Candidates --> */}
                             <div>
                                 <div className={`flex items-center gap-0 rounded-xl transition-colors group ${isActive('candidates') ? 'bg-primary-light' : 'nav-inactive'}`}>
-                                    <button onClick={() => router.push('/admin/candidates')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('candidates') ? 'text-primary' : 'text-slate-500'}`} title="Candidates">
+                                    <button onClick={() => router.push('/admin/candidates')} className={`flex-1 flex items-center gap-3 px-3 py-3 rounded-l-xl transition-colors ${isActive('candidates') ? 'text-primary' : 'text-slate-500'} ${!sidebarOpen && 'justify-center'}`} title={!sidebarOpen ? 'Candidates' : ''}>
                                         <span className="material-symbols-outlined group-hover:text-primary transition-colors">person_add</span>
-                                        <span className="text-sm font-medium">Candidates</span>
+                                        {sidebarOpen && <span className="text-sm font-medium">Candidates</span>}
                                     </button>
                                     {isSidebarOpen && (
                                         <button onClick={() => setExpandedMenu(expandedMenu === 'candidates' ? null : 'candidates')} className={`px-2 py-3 -ml-3 rounded-r-xl transition-colors`} title="Expand menu">
@@ -203,15 +211,15 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                                 </div>
                                 {isSidebarOpen && expandedMenu === 'candidates' && (
                                     <div className="flex flex-col gap-1 mt-1 ml-2 border-l border-primary/30 pl-2">
-                                        <button onClick={() => router.push('/admin/candidates')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('candidates') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('candidates')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">list</span>
                                             All Candidates
                                         </button>
-                                        <button onClick={() => router.push('/admin/candidates')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('candidates') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('candidates')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">done</span>
                                             Hired
                                         </button>
-                                        <button onClick={() => router.push('/admin/candidates')} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('candidates') ? 'text-primary' : 'text-slate-500 hover:text-primary hover:bg-primary-light-hover'}`}>
+                                        <button onClick={() => router.push('candidates')} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary text-sm font-medium transition-colors">
                                             <span className="material-symbols-outlined text-[16px]">pending_actions</span>
                                             In Review
                                         </button>
@@ -227,7 +235,11 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                             {/* <!-- Settings --> */}
                             <button className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors group ${isActive('settings') ? 'bg-primary-light text-primary' : 'text-slate-500 nav-inactive'}`} title="Settings">
                                 <span className="material-symbols-outlined">settings</span>
-                                <span className="text-sm font-semibold">Settings</span>
+                                {sidebarOpen && <span className="text-sm font-medium">Settings</span>}
+                            </button>
+                            <button onClick={() => router.push('help')} className={`flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors ${!sidebarOpen && 'justify-center'}`} title={!sidebarOpen ? 'Support' : ''}>
+                                <span className="material-symbols-outlined">help</span>
+                                {sidebarOpen && <span className="text-sm font-medium">Support</span>}
                             </button>
                         </div>
                         <div className="p-4 mt-auto">
@@ -247,20 +259,24 @@ function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                     {/* <!-- Main Content Wrapper --> */}
                     <div className="flex flex-col flex-1 h-full min-w-0 bg-background-light">
                         {/* <!-- Top Header --> */}
-                        <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-[var(--background)] border-b border-light sticky top-0 z-10 shadow-sm shadow-slate-200/50">
-                            {/* <!-- Left: Search --> */}
+                        <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-surface-light border-b border-border-light sticky top-0 z-10 shadow-sm shadow-slate-200/50">
+                            {/* <!-- Left: Title / Breadcrumbs --> */}
                             <div className="flex items-center gap-4">
                                 <button className="md:hidden p-2 -ml-2 rounded-lg text-slate-500 hover:bg-slate-100" onClick={() => setSidebarOpen(!isSidebarOpen)}>
                                     <span className="material-symbols-outlined">menu</span>
                                 </button>
-                                {/* <!-- Search Trigger (Visual Only) --> */}
-                                <button className="hidden sm:flex flex-1 items-center gap-2 px-8 h-10 rounded-xl bg-slate-50 text-slate-400 hover:text-primary hover:ring-1 hover:ring-primary/20 transition-all border border-transparent justify-start">
-                                    <span className="material-symbols-outlined text-[20px]">search</span>
-                                    <span className="text-sm text-left">Search projects, tasks, or people......</span>
-                                </button>
+                                <div>
+                                    <h2 className="text-lg font-bold text-slate-900 leading-tight">{title}</h2>
+                                    <p className="text-xs text-slate-500 hidden sm:block">{subtitle}</p>
+                                </div>
                             </div>
                             {/* <!-- Right: Actions & Profile --> */}
                             <div className="flex items-center gap-3 sm:gap-6">
+                                {/* <!-- Search Trigger (Visual Only) --> */}
+                                <button className="hidden sm:flex items-center gap-2 px-3 h-10 rounded-xl bg-slate-50 text-slate-400 hover:text-primary hover:ring-1 hover:ring-primary/20 transition-all border border-transparent">
+                                    <span className="material-symbols-outlined text-[20px]">search</span>
+                                    <span className="text-sm">Search...</span>
+                                </button>
                                 <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
                                 {/* <!-- Notification Bell --> */}
                                 <div className="flex items-center gap-3 relative group">

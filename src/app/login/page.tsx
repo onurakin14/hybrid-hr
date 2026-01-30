@@ -43,7 +43,7 @@ function Login() {
                             <h2 className="text-xl font-semibold text-[#131118] mb-2">Log in to your account</h2>
                             <p className="text-sm text-gray-500">Welcome back! Please enter your details.</p>
                         </div>
-                        <form className="space-y-5" onSubmit={handleLogin}>
+                        <form className="space-y-5">
                             {/* <!-- Email Field --> */}
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-[#131118]" htmlFor="email">Email</label>
@@ -52,7 +52,7 @@ function Login() {
                                         <span className="material-symbols-outlined text-gray-400 text-[20px]">mail</span>
                                     </div>
                                     <input className="block w-full border rounded-lg border-gray-200 bg-white pl-10 pr-3 py-3 text-sm placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                                        id="email" name="email" placeholder="name@company.com" type="text" defaultValue={username} onChange={(e) => setUsername(e.target.value)} />
+                                        id="email" name="email" placeholder="name@company.com" type="email" defaultValue={"emilys"} />
                                 </div>
                             </div>
                             {/* <!-- Password Field --> */}
@@ -63,13 +63,13 @@ function Login() {
                                         <span className="material-symbols-outlined text-gray-400 text-[20px]">lock</span>
                                     </div>
                                     <input className="block w-full border rounded-lg border-gray-200 bg-white pl-10 pr-3 py-3 text-sm placeholder-gray-400 focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                                        id="password" name="password" placeholder="••••••••" type="password" defaultValue={password} onChange={(e) => setPassword(e.target.value)} />
+                                        id="password" name="password" placeholder="••••••••" type="password" defaultValue={"emilyspass"} />
                                 </div>
                             </div>
                             {/* <!-- Remember Me & Forgot Password --> */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
-                                    <input className="h-4 w-4 border rounded border-gray-300 accent-[var(--primary)]" id="remember-me" name="remember-me" type="checkbox" defaultChecked />
+                                    <input className="h-4 w-4 border rounded border-gray-300 text-primary focus:ring-primary" id="remember-me" name="remember-me" type="checkbox" defaultChecked />
                                     <label className="ml-2 block text-sm text-gray-500" htmlFor="remember-me">Remember me</label>
                                 </div>
                                 <div className="text-sm">

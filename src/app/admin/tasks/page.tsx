@@ -1,4 +1,4 @@
-"use client";
+import React from "react";
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,16 +9,6 @@ import BoardView from "@/components/tasks/Board";
 import CreateTaskModal from "@/components/tasks/create-task-modal";
 import TaskListView from "@/components/tasks/list";
 
-export default function TasksPage() {
-  const dispatch = useDispatch();
-  const { loading } = useSelector((state: RootState) => state.tasks);
-  const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
-
-  useEffect(() => {
-    dispatch(fetchTasks() as any);
-  }, [dispatch]);
-
-  if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
@@ -43,3 +33,5 @@ export default function TasksPage() {
     </div>
   );
 }
+
+export default Tasks;
