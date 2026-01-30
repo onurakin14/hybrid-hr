@@ -1,6 +1,4 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-
-/* ================= EXISTING TYPES ================= */
 export type Priority = 'low' | 'medium' | 'high';
 export type TaskStatus = 'backlog' | 'todo' | 'in-progress' | 'done';
 
@@ -16,7 +14,6 @@ export interface Task {
   dueDate?: string;
 }
 
-/* ================= ✅ NEW TYPES (ADDED) ================= */
 export type SortField = 'priority' | 'todo';
 export type SortOrder = 'asc' | 'desc';
 
@@ -25,14 +22,11 @@ interface TaskFilter {
   priority?: Priority;
 }
 
-/* ================= EXISTING STATE ================= */
 interface TasksState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
   isCreateOpen: boolean;
-
-  /* ✅ NEW STATE (ADDED) */
   filter: TaskFilter;
   sort: {
     field: SortField | null;
@@ -40,14 +34,11 @@ interface TasksState {
   };
 }
 
-/* ================= INITIAL STATE ================= */
 const initialState: TasksState = {
   tasks: [],
   loading: false,
   error: null,
   isCreateOpen: false,
-
-  /* ✅ ADDED */
   filter: {},
   sort: {
     field: null,
@@ -55,7 +46,6 @@ const initialState: TasksState = {
   },
 };
 
-/* ================= EXISTING THUNKS ================= */
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const response = await fetch('https://dummyjson.com/todos?limit=20');
   const data = await response.json();
@@ -142,7 +132,6 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    /* ===== EXISTING REDUCERS (UNCHANGED) ===== */
     toggleCreate: (state) => {
       state.isCreateOpen = !state.isCreateOpen;
     },
@@ -167,11 +156,10 @@ const tasksSlice = createSlice({
       }
     },
 
-    /* ===== ✅ NEW REDUCERS (ADDED) ===== */
     setFilter: (state, action: PayloadAction<TaskFilter>) => {
       state.filter = {
-        ...state.filter,   // 👈 mevcut filtreleri koru
-        ...action.payload, // 👈 yeni geleni ekle / overwrite et
+        ...state.filter,  
+        ...action.payload, 
       };
     },
 
@@ -191,7 +179,6 @@ const tasksSlice = createSlice({
 
   },
 
-  /* ===== EXISTING EXTRA REDUCERS (UNCHANGED) ===== */
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -221,13 +208,10 @@ const tasksSlice = createSlice({
   },
 });
 
-/* ================= EXPORT ================= */
 export const {
   toggleCreate,
   moveTask,
   toggleTaskComplete,
-
-  /* ✅ NEW EXPORTS */
   setFilter,
   clearFilter,
   setSort,

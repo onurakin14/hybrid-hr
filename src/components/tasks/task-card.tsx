@@ -27,7 +27,6 @@ export default function TaskCard({ task }: TaskCardProps) {
     Frontend: "bg-cyan-100 text-cyan-700",
   };
 
-  /* Görsel simülasyonu */
   const showImage = task.id % 4 === 0;
   const imageUrl = showImage
     ? "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=400"
@@ -149,8 +148,7 @@ export default function TaskCard({ task }: TaskCardProps) {
             />
           )}
         </div>
-
-        {/* Progress – SADECE IN PROGRESS */}
+        
         {task.status === "in-progress" && (
           <div className="mt-3">
             <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">

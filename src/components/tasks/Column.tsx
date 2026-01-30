@@ -58,8 +58,7 @@ export default function Column({
           </div>
         )}
       </Droppable>
-
-      {/* ADD TASK – HER SÜTUN ALTINDA */}
+      
       <button
         onClick={() => dispatch(toggleCreate())}
         className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-700 border border-dashed border-gray-300 rounded-xl py-2 hover:bg-gray-100 transition"

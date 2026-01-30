@@ -108,19 +108,19 @@ export default function Header({
                       onClick={() => handleFilterSelect("high")}
                       className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
                     >
-                      🔴 High Priority
+                       High Priority
                     </button>
                     <button
                       onClick={() => handleFilterSelect("medium")}
                       className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
                     >
-                      🟡 Medium Priority
+                       Medium Priority
                     </button>
                     <button
                       onClick={() => handleFilterSelect("low")}
                       className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
                     >
-                      🟢 Low Priority
+                       Low Priority
                     </button>
                   </div>
 
