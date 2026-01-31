@@ -1,7 +1,7 @@
 "use client";
 
 import { Droppable, Draggable } from "@hello-pangea/dnd";
-import TaskCard from "./task-card";
+import TaskCard from "./TaskCard";
 import { Task, TaskStatus } from "@/lib/features/tasks/taskSlice";
 import { Plus } from "lucide-react";
 import { useDispatch } from "react-redux";

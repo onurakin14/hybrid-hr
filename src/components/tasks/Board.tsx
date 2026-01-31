@@ -7,7 +7,7 @@ import {
   TaskStatus,
   moveTask,
 } from "@/lib/features/tasks/taskSlice";
-import Column from "./column";
+import Column from "./Column";
 import { useMemo } from "react";
 
 const columns: { id: TaskStatus; title: string }[] = [

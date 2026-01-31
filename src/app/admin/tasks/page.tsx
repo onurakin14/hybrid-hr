@@ -1,14 +1,24 @@
-import React from "react";
+"use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { fetchTasks } from "@/lib/features/tasks/taskSlice";
-import Header from "@/components/tasks/tasks-header";
-import BoardView from "@/components/tasks/board";
-import CreateTaskModal from "@/components/tasks/create-task-modal";
-import TaskListView from "@/components/tasks/list";
+import Header from "@/components/tasks/TaskHeader";
+import BoardView from "@/components/tasks/Board";
+import CreateTaskModal from "@/components/tasks/CreateTaskModal";
+import TaskListView from "@/components/tasks/TaskList";
 
+const Tasks = () => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state: RootState) => state.tasks);
+  const [viewMode, setViewMode] = useState<"board" | "list">("board");
+
+  useEffect(() => {
+    dispatch(fetchTasks() as any);
+  }, [dispatch]);
+
+  if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
@@ -23,15 +33,11 @@ import TaskListView from "@/components/tasks/list";
     <div className="h-screen flex flex-col bg-gray-50">
       <Header viewMode={viewMode} onViewModeChange={setViewMode} />
       <div className="flex-1 overflow-hidden">
-        {viewMode === 'board' ? (
-          <BoardView />
-        ) : (
-          <TaskListView />
-        )}
+        {viewMode === "board" ? <BoardView /> : <TaskListView />}
       </div>
       <CreateTaskModal />
     </div>
   );
-}
+};
 
 export default Tasks;
